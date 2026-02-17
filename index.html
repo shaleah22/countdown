@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>School Countdown</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f0f2f5; padding-top: 50px; }
+        .card { background: white; width: 350px; margin: 0 auto; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1a73e8; margin-bottom: 10px; }
+        .days { font-size: 80px; font-weight: bold; color: #202124; margin: 10px 0; }
+        .label { font-size: 20px; color: #5f6368; text-transform: uppercase; letter-spacing: 1px; }
+        .info { margin-top: 20px; font-size: 14px; color: #9aa0a6; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>STUDENT DAYS</h1>
+        <div id="count" class="days">--</div>
+        <div class="label">TODAY INCLUDED</div>
+       
+    </div>
+
+    <script>
+        function calculateSchoolDays() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const end = new Date(2026, 5, 3); // June 3, 2026
+            
+            // Your specific days off (Year, Month-1, Day)
+            const holidays = [
+                '2026-03-13', // Workday
+                '2026-03-16', '2026-03-17', '2026-03-18', '2026-03-19', '2026-03-20', // Spring Break
+                '2026-04-03', // Day off
+                '2026-04-06', // Workday
+                '2026-05-25'  // Memorial Day
+            ];
+
+            let count = 0;
+            let cur = new Date(today);
+
+            while (cur <= end) {
+                const dayOfWeek = cur.getDay();
+                const dateStr = cur.toISOString().split('T')[0];
+                
+                // If not Saturday(6), not Sunday(0), and not in holiday list
+                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.includes(dateStr)) {
+                    count++;
+                }
+                cur.setDate(cur.getDate() + 1);
+            }
+            return count;
+        }
+
+        document.getElementById('count').innerText = calculateSchoolDays();
+    </script>
+</body>
+</html>
