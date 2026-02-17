@@ -1,22 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Countdown</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f0f2f5; padding-top: 50px; }
-        .card { background: white; width: 350px; margin: 0 auto; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #1a73e8; margin-bottom: 10px; }
-        .days { font-size: 80px; font-weight: bold; color: #202124; margin: 10px 0; }
-        .label { font-size: 20px; color: #5f6368; text-transform: uppercase; letter-spacing: 1px; }
-        .info { margin-top: 20px; font-size: 14px; color: #9aa0a6; }
+        /* Removes default margins and makes the body a full-screen container */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+        }
+
+        /* The card now scales based on the viewport size */
+        .card {
+            background: white;
+            width: 90vw; /* Takes up 90% of screen width */
+            max-width: 800px; /* But won't get ridiculously wide on ultra-wide monitors */
+            padding: 5vh 2vw;
+            border-radius: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 { 
+            color: #1a73e8; 
+            margin: 0;
+            font-size: clamp(1.5rem, 5vw, 3rem); /* Scalable font: min, preferred, max */
+            letter-spacing: 2px;
+        }
+
+        /* This is the big number */
+        .days { 
+            /* Scalable font: dynamic based on screen width */
+            font-size: clamp(5rem, 25vw, 15rem); 
+            font-weight: 800; 
+            color: #202124; 
+            line-height: 1;
+            margin: 2vh 0;
+        }
+
+        .label { 
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: #5f6368; 
+            text-transform: uppercase; 
+            letter-spacing: 0.2rem; 
+        }
+
+        /* Subtle info footer */
+        .info { 
+            margin-top: 3vh; 
+            font-size: 0.9rem; 
+            color: #9aa0a6; 
+        }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>STUDENT DAYS</h1>
         <div id="count" class="days">--</div>
-        <div class="label">TODAY INCLUDED</div>
-       
+        <div class="label">UNTIL JUNE 3</div>
     </div>
 
     <script>
@@ -25,13 +77,10 @@
             today.setHours(0,0,0,0);
             const end = new Date(2026, 5, 3); // June 3, 2026
             
-            // Your specific days off (Year, Month-1, Day)
             const holidays = [
-                '2026-03-13', // Workday
-                '2026-03-16', '2026-03-17', '2026-03-18', '2026-03-19', '2026-03-20', // Spring Break
-                '2026-04-03', // Day off
-                '2026-04-06', // Workday
-                '2026-05-25'  // Memorial Day
+                '2026-03-13', '2026-03-16', '2026-03-17', '2026-03-18', 
+                '2026-03-19', '2026-03-20', '2026-04-03', '2026-04-06', 
+                '2026-05-25'
             ];
 
             let count = 0;
@@ -41,7 +90,6 @@
                 const dayOfWeek = cur.getDay();
                 const dateStr = cur.toISOString().split('T')[0];
                 
-                // If not Saturday(6), not Sunday(0), and not in holiday list
                 if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.includes(dateStr)) {
                     count++;
                 }
