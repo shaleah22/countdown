@@ -1,104 +1,332 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Countdown</title>
-    <style>
-        /* Removes default margins and makes the body a full-screen container */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #f0f2f5;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>School Days Left · Broward 2026–27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F6F8FC;
+    --rule: #CFDBEE;
+    --margin: #D94848;
+    --ink: #1B2A4A;
+    --soft: #5B6A88;
+    --pencil: #F2C230;
+    --early: #58C7E6;
+    --tile-empty: #E3EAF5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--paper);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+  }
+  .kicker { font-size: 1rem; color: var(--soft); margin: 0 0 8px; }
+  .big {
+    font-family: "Bricolage Grotesque", "Arial Black", Impact, sans-serif;
+    font-weight: 800;
+    font-size: clamp(7rem, 26vw, 13rem);
+    line-height: .85;
+    letter-spacing: -0.04em;
+    margin: 0;
+  }
+  .big-label {
+    font-family: "Bricolage Grotesque", "Arial Black", sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.5rem, 4.5vw, 2.25rem);
+    margin: 10px 0 0;
+  }
+  .today-note { margin: 14px 0 0; color: var(--soft); font-size: 1.05rem; }
 
-        /* The card now scales based on the viewport size */
-        .card {
-            background: white;
-            width: 90vw; /* Takes up 90% of screen width */
-            max-width: 800px; /* But won't get ridiculously wide on ultra-wide monitors */
-            padding: 5vh 2vw;
-            border-radius: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+  .progress { margin-top: 48px; }
+  .progress-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .pct {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800; font-size: 3rem; line-height: 1;
+  }
+  .pct-sub { color: var(--soft); }
+  .bar {
+    height: 22px; border-radius: 11px; background: var(--tile-empty);
+    border: 2px solid var(--ink); overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; width: 0; background: var(--pencil);
+    border-right: 2px solid var(--ink);
+    transition: width 1.2s cubic-bezier(.2,.8,.2,1);
+  }
 
-        h1 { 
-            color: #1a73e8; 
-            margin: 0;
-            font-size: clamp(1.5rem, 5vw, 3rem); /* Scalable font: min, preferred, max */
-            letter-spacing: 2px;
-        }
+  .tiles-wrap { margin-top: 44px; }
+  .tiles-wrap h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 500; font-size: 1.25rem; margin: 0 0 12px;
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
+    gap: 4px;
+  }
+  .tile {
+    aspect-ratio: 1; border-radius: 3px; background: var(--tile-empty);
+  }
+  .tile.done { background: var(--ink); }
+  .tile.early:not(.done) { box-shadow: inset 0 0 0 2px var(--early); }
+  .tile.done.early { background: var(--early); }
+  .tile.monday { background: #BFE6CF; }
+  .tile.monday.done { background: #2E9E62; }
+  .tile.today { background: var(--pencil); outline: 2px solid var(--ink); }
+  .tile { cursor: default; transition: transform .1s; }
+  .tile:hover, .tile:focus-visible { transform: scale(1.35); position: relative; z-index: 2; outline: 2px solid var(--margin); }
+  .tip {
+    position: fixed; z-index: 10; pointer-events: none;
+    background: var(--ink); color: #fff;
+    padding: 8px 12px; border-radius: 8px;
+    font-size: .9rem; line-height: 1.35; white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(27,42,74,.25);
+    opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s;
+  }
+  .tip.show { opacity: 1; transform: translateY(0); }
+  .tip b { font-family: "Bricolage Grotesque", sans-serif; font-size: 1rem; }
+  .tip .meta { color: #C9D6EA; }
+  .tip .tag { color: var(--pencil); }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; font-size: .9rem; color: var(--soft); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 
-        /* This is the big number */
-        .days { 
-            /* Scalable font: dynamic based on screen width */
-            font-size: clamp(5rem, 25vw, 15rem); 
-            font-weight: 800; 
-            color: #202124; 
-            line-height: 1;
-            margin: 2vh 0;
-        }
+  .facts {
+    margin-top: 44px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px;
+  }
+  .fact b {
+    display: block; font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800; font-size: 1.6rem;
+  }
+  .fact span { color: var(--soft); }
+  footer { margin-top: 48px; font-size: .85rem; color: var(--soft); line-height: 1.5; }
 
-        .label { 
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            color: #5f6368; 
-            text-transform: uppercase; 
-            letter-spacing: 0.2rem; 
-        }
-
-        /* Subtle info footer */
-        .info { 
-            margin-top: 3vh; 
-            font-size: 0.9rem; 
-            color: #9aa0a6; 
-        }
-    </style>
+  @media (max-width: 520px) {
+    main { padding: 32px 18px 48px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bar-fill { transition: none; } }
+</style>
 </head>
 <body>
-    <div class="card">
-        <h1>STUDENT DAYS</h1>
-        <div id="count" class="days">--</div>
-        <div class="label">UNTIL JUNE 3</div>
+<main>
+  <p class="kicker">Broward County Public Schools · 2026–27</p>
+  <h1 class="big" id="left">–</h1>
+  <p class="big-label" id="leftLabel">school days left</p>
+  <p class="today-note" id="todayNote"></p>
+
+  <section class="progress">
+    <div class="progress-head">
+      <div class="pct" id="pct">0%</div>
+      <div class="pct-sub" id="pctSub"></div>
     </div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar">
+      <div class="bar-fill" id="fill"></div>
+    </div>
+  </section>
 
-    <script>
-        function calculateSchoolDays() {
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            const end = new Date(2026, 5, 3); // June 3, 2026
-            
-            const holidays = [
-                '2026-03-13', '2026-03-16', '2026-03-17', '2026-03-18', 
-                '2026-03-19', '2026-03-20', '2026-04-03', '2026-04-06', 
-                '2026-05-25'
-            ];
+  <section class="tiles-wrap">
+    <h2>Every school day of the year</h2>
+    <div class="tiles" id="tiles"></div>
+    <div class="tip" id="tip" role="tooltip"></div>
+    <div class="legend">
+      <span><i style="background:var(--ink)"></i>Done</span>
+      <span><i style="background:var(--pencil);outline:2px solid var(--ink)"></i>Today</span>
+      <span><i style="background:#2E9E62"></i>Monday, done</span>
+      <span><i style="background:#BFE6CF"></i>Monday, to go</span>
+      <span><i style="box-shadow:inset 0 0 0 2px var(--early)"></i>Early release</span>
+      <span><i style="background:var(--tile-empty)"></i>Still to go</span>
+    </div>
+  </section>
 
-            let count = 0;
-            let cur = new Date(today);
+  <section class="facts">
+    <div class="fact"><b id="nextOff">–</b><span id="nextOffLabel">next day off</span></div>
+    <div class="fact"><b id="monLeft">–</b><span id="monLabel">school Mondays left</span></div>
+    <div class="fact"><b id="calLeft">–</b><span>calendar days until the last day</span></div>
+  </section>
 
-            while (cur <= end) {
-                const dayOfWeek = cur.getDay();
-                const dateStr = cur.toISOString().split('T')[0];
-                
-                if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.includes(dateStr)) {
-                    count++;
-                }
-                cur.setDate(cur.getDate() + 1);
-            }
-            return count;
-        }
+  <footer>
+    First day: Mon, Aug 10, 2026 · Last day: Fri, May 28, 2027 (early release).<br>
+    Weekends, holidays, employee planning days and school-closed days are skipped. Early release days count as full school days.
+    A school day counts as done at 3:45 PM. Severe-weather make-up days (10/9, 12/18, 3/18, 4/30, 5/28) are regular school days unless the district uses them.
+  </footer>
+</main>
 
-        document.getElementById('count').innerText = calculateSchoolDays();
-    </script>
+<script>
+(function () {
+  const FIRST = "2026-08-10";
+  const LAST  = "2027-05-28";
+  const DISMISSAL_MINUTES = 15 * 60 + 45; // after 3:45 PM, today counts as completed
+
+  // Weekdays with no school for students (from the 2026/27 calendar)
+  const OFF = {
+    "2026-09-07": "Labor Day",
+    "2026-09-21": "No school",
+    "2026-10-12": "Teacher planning day",
+    "2026-11-03": "Teacher planning day",
+    "2026-11-11": "Veterans Day",
+    "2026-11-23": "Thanksgiving break", "2026-11-24": "Thanksgiving break",
+    "2026-11-25": "Thanksgiving break", "2026-11-26": "Thanksgiving break",
+    "2026-11-27": "Thanksgiving break",
+    "2026-12-21": "Winter break", "2026-12-22": "Winter break", "2026-12-23": "Winter break",
+    "2026-12-24": "Winter break", "2026-12-25": "Winter break", "2026-12-28": "Winter break",
+    "2026-12-29": "Winter break", "2026-12-30": "Winter break", "2026-12-31": "Winter break",
+    "2027-01-01": "Winter break",
+    "2027-01-04": "Teacher planning day",
+    "2027-01-18": "MLK Day",
+    "2027-02-15": "Presidents' Day",
+    "2027-03-10": "No school",
+    "2027-03-19": "Teacher planning day",
+    "2027-03-22": "Spring break", "2027-03-23": "Spring break", "2027-03-24": "Spring break",
+    "2027-03-25": "Spring break", "2027-03-26": "Spring break"
+  };
+  const EARLY = new Set(["2026-10-09","2026-12-18","2027-02-12","2027-03-18","2027-04-30","2027-05-28"]);
+
+  // Other things marked on the calendar (still regular school days)
+  const EVENTS = {
+    "2026-08-10": "First day of school",
+    "2026-09-09": "Interim reports issued",
+    "2026-10-21": "Report cards issued",
+    "2026-11-10": "Interim reports issued",
+    "2027-01-13": "Report cards issued",
+    "2027-02-16": "Interim reports issued",
+    "2027-04-06": "Report cards issued",
+    "2027-04-28": "Interim reports issued",
+    "2027-05-24": "Grade 12 report cards issued",
+    "2027-05-28": "Last day of school"
+  };
+
+  const key = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+  const fmt = d => d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+
+  // Build list of school days
+  const days = [];
+  for (let d = parse(FIRST); d <= parse(LAST); d.setDate(d.getDate()+1)) {
+    const k = key(d), wd = d.getDay();
+    if (wd !== 0 && wd !== 6 && !OFF[k]) days.push(k);
+  }
+  const TOTAL = days.length; // 180
+
+  function render() {
+    const now = new Date();
+    const todayKey = key(now);
+    const isSchoolToday = days.includes(todayKey);
+    const todayOver = now.getHours() * 60 + now.getMinutes() >= DISMISSAL_MINUTES;
+
+    let done = days.filter(k => k < todayKey).length;
+    if (isSchoolToday && todayOver) done++;
+    const left = TOTAL - done;
+    const pct = done / TOTAL * 100;
+
+    document.getElementById("left").textContent = left;
+    document.getElementById("leftLabel").textContent = left === 1 ? "school day left" : "school days left";
+
+    let note;
+    if (todayKey < FIRST) note = "School hasn't started yet. First day is Mon, Aug 10.";
+    else if (left === 0) note = "That's a wrap. Have a great summer!";
+    else if (isSchoolToday && !todayOver) note = "Today is a school day" + (EARLY.has(todayKey) ? " (early release)" : "") + " and it's included in the count.";
+    else if (isSchoolToday) note = "Today's done. Count starts from the next school day.";
+    else note = "No school today" + (OFF[todayKey] ? " — " + OFF[todayKey] : " — enjoy the weekend") + ".";
+    document.getElementById("todayNote").textContent = note;
+
+    document.getElementById("pct").textContent = (pct >= 10 ? pct.toFixed(1) : pct.toFixed(1)) + "%";
+    document.getElementById("pctSub").textContent = done + " of " + TOTAL + " school days completed";
+    const bar = document.getElementById("bar");
+    bar.setAttribute("aria-valuenow", pct.toFixed(1));
+    requestAnimationFrame(() => { document.getElementById("fill").style.width = pct + "%"; });
+
+    // Tiles
+    const tiles = document.getElementById("tiles");
+    tiles.innerHTML = "";
+    days.forEach((k, i) => {
+      const t = document.createElement("div");
+      t.className = "tile";
+      if (i < done) t.classList.add("done");
+      else if (k === todayKey) t.classList.add("today");
+      if (EARLY.has(k)) t.classList.add("early");
+      if (parse(k).getDay() === 1) t.classList.add("monday");
+      t.tabIndex = 0;
+      const dateLong = parse(k).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+      let status;
+      if (i < done) status = "Completed";
+      else if (k === todayKey) status = "Today";
+      else {
+        const ahead = days.slice(done).indexOf(k);
+        status = ahead === 1 ? "Next school day" : ahead + " school days from now";
+      }
+      const tags = [];
+      if (EARLY.has(k)) tags.push("Early release");
+      if (EVENTS[k]) tags.push(EVENTS[k]);
+      t.dataset.tip =
+        "<b>" + dateLong + "</b><br>" +
+        "<span class='meta'>Day " + (i+1) + " of " + TOTAL + " · " + status + "</span>" +
+        (tags.length ? "<br><span class='tag'>" + tags.join(" · ") + "</span>" : "");
+      t.setAttribute("aria-label", t.dataset.tip.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+      tiles.appendChild(t);
+    });
+
+    // Next weekday off (holiday / break), after today
+    const nextOff = Object.keys(OFF).find(k => k > todayKey && k <= LAST);
+    if (nextOff) {
+      document.getElementById("nextOff").textContent = fmt(parse(nextOff));
+      document.getElementById("nextOffLabel").textContent = "next day off · " + OFF[nextOff];
+    } else {
+      document.getElementById("nextOff").textContent = "Summer";
+      document.getElementById("nextOffLabel").textContent = "next day off · starts after May 28";
+    }
+
+    const mondays = days.filter(k => parse(k).getDay() === 1);
+    const monLeft = mondays.filter(k => days.indexOf(k) >= done).length;
+    document.getElementById("monLeft").textContent = monLeft;
+    document.getElementById("monLabel").textContent =
+      (monLeft === 1 ? "school Monday left" : "school Mondays left") +
+      " · " + (mondays.length - monLeft) + " of " + mondays.length + " done";
+
+    const t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const calLeft = Math.max(0, Math.round((parse(LAST) - t0) / 86400000));
+    document.getElementById("calLeft").textContent = calLeft;
+  }
+
+  // Hover / focus / tap tooltip
+  const tip = document.getElementById("tip");
+  const tilesEl = document.getElementById("tiles");
+  function showTip(t) {
+    tip.innerHTML = t.dataset.tip;
+    tip.classList.add("show");
+    const r = t.getBoundingClientRect();
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let x = r.left + r.width / 2 - tw / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - tw - 8));
+    let y = r.top - th - 10;
+    if (y < 8) y = r.bottom + 10;
+    tip.style.left = x + "px";
+    tip.style.top = y + "px";
+  }
+  const hideTip = () => tip.classList.remove("show");
+  tilesEl.addEventListener("mouseover", e => { if (e.target.classList.contains("tile")) showTip(e.target); });
+  tilesEl.addEventListener("mouseleave", hideTip);
+  tilesEl.addEventListener("focusin", e => { if (e.target.classList.contains("tile")) showTip(e.target); });
+  tilesEl.addEventListener("focusout", hideTip);
+  tilesEl.addEventListener("click", e => { if (e.target.classList.contains("tile")) showTip(e.target); });
+  window.addEventListener("scroll", hideTip, { passive: true });
+
+  render();
+  setInterval(render, 60 * 1000);
+})();
+</script>
 </body>
 </html>
