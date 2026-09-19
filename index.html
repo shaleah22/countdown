@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,6 +114,57 @@
     font-weight: 800; font-size: 1.6rem;
   }
   .fact span { color: var(--soft); }
+
+  /* The math, written out like it is on notebook paper */
+  .math { margin-top: 48px; }
+  .math h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 500; font-size: 1.25rem; margin: 0 0 12px;
+  }
+  .sheet {
+    position: relative;
+    background-color: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 28px 24px 28px 64px;
+    overflow-x: auto;
+  }
+  .sheet::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 44px;
+    width: 2px; background: var(--margin); opacity: .6;
+  }
+  .frac { display: inline-grid; font-size: 1.15rem; margin-bottom: 28px; }
+  .frac > span { padding: 4px 8px; }
+  .frac .num { border-bottom: 3px solid var(--ink); }
+  .frac b {
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+    font-size: 1.6rem; margin-right: 8px;
+  }
+  .ld {
+    display: grid;
+    grid-auto-rows: 2.6rem;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 500; font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+    width: max-content;
+  }
+  .ld .c { display: flex; align-items: center; justify-content: center; position: relative; }
+  .ld .q { color: var(--margin); font-weight: 800; }
+  .ld .dot {
+    color: var(--margin); font-weight: 800; font-size: 1.5em;
+    line-height: 1; padding-bottom: .12em;
+  }
+  .ld .bracket {
+    border-top: 3px solid var(--ink); border-left: 3px solid var(--ink);
+    border-top-left-radius: 14px 26px; margin-top: 2px;
+  }
+  .ld .line { align-self: end; height: 3px; background: var(--ink); }
+  .ld .rem { color: var(--soft); }
+  .steps { margin: 28px 0 0; padding: 0; list-style: none; font-size: 1.15rem; line-height: 1.6; }
+  .steps li + li { margin-top: 6px; }
+  .steps b { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; }
+  .steps .why { display: block; color: var(--soft); font-size: .95rem; }
+
   footer { margin-top: 48px; font-size: .85rem; color: var(--soft); line-height: 1.5; }
 
   @media (max-width: 520px) {
@@ -156,6 +208,15 @@
     <div class="fact"><b id="nextOff">–</b><span id="nextOffLabel">next day off</span></div>
     <div class="fact"><b id="monLeft">–</b><span id="monLabel">school Mondays left</span></div>
     <div class="fact"><b id="calLeft">–</b><span>calendar days until the last day</span></div>
+  </section>
+
+  <section class="math" aria-labelledby="mathHead">
+    <h2 id="mathHead">How we get the percentage</h2>
+    <div class="sheet">
+      <div class="frac" id="frac"></div>
+      <div class="ld" id="ld" aria-hidden="true"></div>
+      <ol class="steps" id="steps"></ol>
+    </div>
   </section>
 
   <footer>
@@ -221,6 +282,105 @@
   }
   const TOTAL = days.length; // 180
 
+
+  // Long division of done ÷ TOTAL, laid out on a grid so every digit lines up
+  const DECIMALS = 4;
+  function renderMath(done) {
+    const frac = document.getElementById("frac");
+    const ld = document.getElementById("ld");
+    const steps = document.getElementById("steps");
+    frac.innerHTML =
+      "<span class='num'><b>" + done + "</b>school days completed</span>" +
+      "<span class='den'><b>" + TOTAL + "</b>total school days</span>";
+    ld.innerHTML = "";
+
+    if (done === 0) {
+      steps.innerHTML = "<li><b>0 ÷ " + TOTAL + " = 0</b>, so <b>0%</b> of the year is done. Check back after the first day!</li>";
+      return;
+    }
+
+    const whole = String(done), L = whole.length;
+    const digits = (whole + "0".repeat(DECIMALS)).split("").map(Number);
+    const N = digits.length;
+    const divisor = String(TOTAL), D = divisor.length;
+    // grid column for dividend digit i; the decimal point gets its own column after the whole-number digits
+    const col = i => D + 2 + i + (i >= L ? 1 : 0);
+    const DOT_COL = D + 2 + L;
+    ld.style.gridTemplateColumns =
+      "repeat(" + (D + 1 + L) + ", .78em) .32em repeat(" + DECIMALS + ", .78em)";
+
+    const put = (text, row, c, cls) => {
+      const el = document.createElement("div");
+      el.className = "c" + (cls ? " " + cls : "");
+      el.textContent = text;
+      el.style.gridRow = row; el.style.gridColumn = c;
+      ld.appendChild(el);
+      return el;
+    };
+    const putNum = (num, row, endI, cls) => {  // right-aligned so last digit sits under digit endI
+      const str = String(num);
+      str.split("").forEach((ch, k) => put(ch, row, col(endI - str.length + 1 + k), cls));
+      return col(endI - str.length + 1);
+    };
+
+    // Do the division
+    let rem = 0; const q = []; const work = [];
+    for (let i = 0; i < N; i++) {
+      rem = rem * 10 + digits[i];
+      q[i] = Math.floor(rem / TOTAL);
+      if (q[i] > 0) { work.push({ i, partial: rem, product: q[i] * TOTAL }); rem -= q[i] * TOTAL; }
+    }
+
+    // Row 1: the answer on top (always keep the ones digit, so 29 ÷ 180 reads 0.1611)
+    let seen = false;
+    for (let i = 0; i < N; i++) {
+      if (i < L - 1 && !seen && q[i] === 0) continue;
+      seen = true;
+      put(String(q[i]), 1, col(i), "q");
+    }
+    put(".", 1, DOT_COL, "dot");
+    // Row 2: divisor, bracket, dividend
+    divisor.split("").forEach((ch, k) => put(ch, 2, k + 1));
+    const br = document.createElement("div");
+    br.className = "bracket"; br.style.gridRow = 2; br.style.gridColumn = col(0) + " / " + (col(N - 1) + 1);
+    ld.appendChild(br);
+    digits.forEach((dg, i) => put(String(dg), 2, col(i)));
+    put(".", 2, DOT_COL, "dot");
+
+    // Subtract, bring down, repeat
+    let row = 3;
+    work.forEach((w, k) => {
+      if (k > 0) { putNum(w.partial, row, w.i); row++; }
+      const start = putNum(w.product, row, w.i);
+      put("−", row, start - 1);
+      const line = document.createElement("div");
+      line.className = "line"; line.style.gridRow = row;
+      line.style.gridColumn = (start - 1) + " / " + (col(w.i) + 1);
+      ld.appendChild(line);
+      row++;
+    });
+    const last = work[work.length - 1];
+    putNum(rem, row, rem === 0 ? last.i : N - 1, "rem");
+
+    // Explain it in words
+    const dec = q.slice(L).join("");
+    const intPart = q.slice(0, L).join("").replace(/^0+/, "");
+    const quotient = (intPart || "0") + "." + dec;
+    const hundredths = Number(quotient) * 100;
+    const pctRounded = (done / TOTAL * 100).toFixed(1);
+    const more = rem > 0 ? "…" : "";
+    steps.innerHTML =
+      "<li><b>" + done + " ÷ " + TOTAL + " = " + quotient + more + "</b>" +
+        "<span class='why'>" + (rem > 0
+          ? "It keeps going forever (there's always a remainder of " + rem + "), so we stop after " + DECIMALS + " decimal places."
+          : "It comes out even, with no remainder.") + "</span></li>" +
+      "<li><b>" + quotient + " × 100 = " + hundredths.toFixed(DECIMALS - 2) + "%</b>" +
+        "<span class='why'>Percent means “out of 100,” so multiply by 100 (move the decimal point two places right).</span></li>" +
+      "<li><b>Rounded to one decimal place: " + pctRounded + "%</b>" +
+        "<span class='why'>That's the number at the top of the page.</span></li>";
+  }
+  let lastMathDone = -1;
+
   function render() {
     const now = new Date();
     const todayKey = key(now);
@@ -248,6 +408,7 @@
     const bar = document.getElementById("bar");
     bar.setAttribute("aria-valuenow", pct.toFixed(1));
     requestAnimationFrame(() => { document.getElementById("fill").style.width = pct + "%"; });
+    if (done !== lastMathDone) { renderMath(done); lastMathDone = done; }
 
     // Tiles
     const tiles = document.getElementById("tiles");
