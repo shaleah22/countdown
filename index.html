@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -165,10 +166,68 @@
   .steps b { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; }
   .steps .why { display: block; color: var(--soft); font-size: .95rem; }
 
+  /* Percent proportion, solved line by line with the = signs lined up */
+  .alg {
+    display: grid;
+    grid-template-columns: max-content max-content max-content minmax(12rem, 1fr);
+    column-gap: 14px; row-gap: 22px;
+    align-items: center;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 500; font-size: 1.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .alg .l { justify-self: end; }
+  .alg .r { justify-self: start; }
+  .alg .eqs { justify-self: center; }
+  .alg .note {
+    font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+    font-size: .95rem; color: var(--soft); padding-left: 14px; line-height: 1.35;
+  }
+  .alg .note b { color: var(--ink); }
+  .alg .x { color: var(--margin); font-weight: 800; }
+  .alg .fr { display: inline-grid; text-align: center; line-height: 1.1; vertical-align: middle; }
+  .alg .fr > span { padding: 3px 8px; }
+  .alg .fr > span:first-child { border-bottom: 3px solid var(--ink); }
+  .alg .cancel { text-decoration: line-through; text-decoration-color: var(--margin); text-decoration-thickness: 3px; }
+  .answer {
+    margin: 30px 0 0; font-size: 1.15rem; line-height: 1.6;
+    border-top: 2px dashed var(--rule); padding-top: 18px;
+  }
+  .answer b { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; }
+  @media (max-width: 600px) {
+    .alg { grid-template-columns: max-content max-content max-content; row-gap: 6px; font-size: 1.3rem; }
+    .sheet { padding: 22px 14px 22px 40px; }
+    .sheet::before { left: 26px; }
+    .alg .fr .fr, .alg .fr > span { padding: 2px 5px; }
+    .alg .note { grid-column: 1 / -1; padding: 0 0 14px; width: 0; min-width: 100%; }
+    .alg + .answer { margin-top: 12px; }
+  }
+
+  /* Extra math sections: a picture (pie or graph) above the worked steps */
+  .viz { margin: 0 0 28px; }
+  .viz svg { display: block; width: 100%; height: auto; }
+  .viz.pie svg { max-width: 220px; }
+  .viz.graph svg { max-width: 460px; }
+  .viz.wide svg { max-width: 620px; }
+  .alg.stack { grid-template-columns: max-content max-content max-content; row-gap: 4px; }
+  .alg.stack .note { grid-column: 1 / -1; padding: 0 0 16px; width: 0; min-width: 100%; }
+  .alg .yes { color: #2E9E62; font-weight: 800; }
+  .alg .rep { text-decoration: overline; text-decoration-thickness: 2px; }
+  .viz.rect svg { max-width: 360px; }
+  .alg .no { color: var(--soft); }
+  .viz text { font-family: "Atkinson Hyperlegible", system-ui, sans-serif; fill: var(--soft); font-size: 12px; }
+  .viz text.lab { fill: var(--ink); font-weight: 700; font-size: 13px; }
+  .viz text.hot { fill: var(--margin); font-weight: 700; font-size: 14px; }
+  .alg sup { font-size: .55em; }
+
   footer { margin-top: 48px; font-size: .85rem; color: var(--soft); line-height: 1.5; }
 
   @media (max-width: 520px) {
     main { padding: 32px 18px 48px; }
+  }
+  @media (max-width: 600px) {
+    .viz.wide { overflow-x: auto; }
+    .viz.wide svg { min-width: 540px; }
   }
   @media (prefers-reduced-motion: reduce) { .bar-fill { transition: none; } }
 </style>
@@ -217,6 +276,119 @@
       <div class="ld" id="ld" aria-hidden="true"></div>
       <ol class="steps" id="steps"></ol>
     </div>
+  </section>
+
+  <section class="math" aria-labelledby="propHead">
+    <h2 id="propHead">Same answer, as a percent proportion</h2>
+    <div class="sheet">
+      <div class="alg" id="alg"></div>
+      <p class="answer" id="propAnswer"></p>
+    </div>
+  </section>
+
+  <section class="math" aria-labelledby="simpHead">
+    <h2 id="simpHead">Simplest form of the fraction</h2>
+    <div class="sheet"><div class="alg" id="simpAlg"></div><p class="answer" id="simpAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="ratioHead">
+    <h2 id="ratioHead">Ratio of days done to days left</h2>
+    <div class="sheet"><div class="alg" id="ratioAlg"></div><p class="answer" id="ratioAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="pieHead">
+    <h2 id="pieHead">The year as a circle graph</h2>
+    <div class="sheet"><div class="viz pie" id="pieViz"></div><div class="alg" id="pieAlg"></div><p class="answer" id="pieAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="lineHead">
+    <h2 id="lineHead">Days left as a linear function</h2>
+    <div class="sheet"><div class="viz graph" id="lineViz"></div><div class="alg" id="lineAlg"></div><p class="answer" id="lineAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="rateHead">
+    <h2 id="rateHead">Unit rate: calendar days per school day</h2>
+    <div class="sheet"><div class="alg" id="rateAlg"></div><p class="answer" id="rateAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="sciHead">
+    <h2 id="sciHead">Seconds of school left, in scientific notation</h2>
+    <div class="sheet"><div class="alg" id="sciAlg"></div><p class="answer" id="sciAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="probHead">
+    <h2 id="probHead">Probability of a Monday</h2>
+    <div class="sheet"><div class="alg" id="probAlg"></div><p class="answer" id="probAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="divHead">
+    <h2 id="divHead">Divisibility rules for days left</h2>
+    <div class="sheet"><div class="alg" id="divAlg"></div><p class="answer" id="divAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="sqrtHead">
+    <h2 id="sqrtHead">Estimating the square root of days left</h2>
+    <div class="sheet"><div class="alg" id="sqrtAlg"></div><p class="answer" id="sqrtAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="weeksHead">
+    <h2 id="weeksHead">School weeks left, with remainders</h2>
+    <div class="sheet"><div class="alg" id="weeksAlg"></div><p class="answer" id="weeksAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="mileHead">
+    <h2 id="mileHead">Percent of a number: milestones ahead</h2>
+    <div class="sheet"><div class="alg stack" id="mileAlg"></div><p class="answer" id="mileAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="chgHead">
+    <h2 id="chgHead">Percent change over the last 30 days</h2>
+    <div class="sheet"><div class="alg stack" id="chgAlg"></div><p class="answer" id="chgAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="nlHead">
+    <h2 id="nlHead">Integers on a number line</h2>
+    <div class="sheet"><div class="viz wide" id="nlViz"></div><div class="alg stack" id="nlAlg"></div><p class="answer" id="nlAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="statHead">
+    <h2 id="statHead">Statistics: school days in each month</h2>
+    <div class="sheet"><div class="viz wide" id="statViz"></div><div class="alg stack" id="statAlg"></div><p class="answer" id="statAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="decHead">
+    <h2 id="decHead">Repeating or terminating decimal?</h2>
+    <div class="sheet"><div class="alg" id="decAlg"></div><p class="answer" id="decAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="sysHead">
+    <h2 id="sysHead">A system of equations for today</h2>
+    <div class="sheet"><div class="alg" id="sysAlg"></div><p class="answer" id="sysAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="prop2Head">
+    <h2 id="prop2Head">A proportional relationship: hours in school</h2>
+    <div class="sheet"><div class="viz graph" id="prop2Viz"></div><div class="alg" id="prop2Alg"></div><p class="answer" id="prop2Answer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="rectHead">
+    <h2 id="rectHead">Rectangles with an area of 180</h2>
+    <div class="sheet"><div class="viz rect" id="rectViz"></div><div class="alg stack" id="rectAlg"></div><p class="answer" id="rectAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="sectHead">
+    <h2 id="sectHead">Area and arc length of the circle graph slice</h2>
+    <div class="sheet"><div class="alg stack" id="sectAlg"></div><p class="answer" id="sectAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="boxHead">
+    <h2 id="boxHead">Box plot of school days per month</h2>
+    <div class="sheet"><div class="viz wide" id="boxViz"></div><div class="alg stack" id="boxAlg"></div><p class="answer" id="boxAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="sdivHead">
+    <h2 id="sdivHead">Dividing in scientific notation</h2>
+    <div class="sheet"><div class="alg stack" id="sdivAlg"></div><p class="answer" id="sdivAnswer"></p></div>
   </section>
 
   <footer>
@@ -379,6 +551,637 @@
       "<li><b>Rounded to one decimal place: " + pctRounded + "%</b>" +
         "<span class='why'>That's the number at the top of the page.</span></li>";
   }
+  // Percent proportion: done / TOTAL = x / 100, solved by cross-multiplying
+  function renderProportion(done) {
+    const alg = document.getElementById("alg");
+    const fr = (top, bottom) => "<span class='fr'><span>" + top + "</span><span>" + bottom + "</span></span>";
+    const X = "<span class='x'>x</span>";
+    const product = done * 100;
+    const exact = product % TOTAL === 0;
+    // Cut off (not rounded) at 2 decimals so it matches the long division digits above
+    const xVal = exact ? String(product / TOTAL) : (Math.floor(product * 100 / TOTAL) / 100).toFixed(2) + "…";
+    const rows = [
+      [fr(done, TOTAL), fr(X, 100),
+        "<b>Part over whole = percent over 100.</b> " + done + " days done out of " + TOTAL + " total, and x is the percent we want."],
+      [TOTAL + " · " + X, done + " · 100",
+        "<b>Cross-multiply.</b> Multiply diagonally across the equals sign: " + TOTAL + " times x, and " + done + " times 100."],
+      [TOTAL + X, String(product),
+        "<b>Multiply.</b> " + done + " × 100 = " + product + "."],
+      [fr("<span class='cancel'>" + TOTAL + "</span>" + X, "<span class='cancel'>" + TOTAL + "</span>"), fr(product, TOTAL),
+        "<b>Divide both sides by " + TOTAL + ".</b> That undoes the “times " + TOTAL + "” and leaves x by itself."],
+      [X, xVal,
+        exact ? "<b>It divides evenly.</b>" : "<b>It keeps going,</b> just like the long division above, so we round."]
+    ];
+    alg.innerHTML = rows.map(([l, r, note]) =>
+      "<div class='l'>" + l + "</div><div class='eqs'>=</div><div class='r'>" + r + "</div><div class='note'>" + note + "</div>"
+    ).join("");
+    const pctShown = exact ? String(product / TOTAL) : (done / TOTAL * 100).toFixed(1);
+    document.getElementById("propAnswer").innerHTML =
+      "x " + (exact ? "=" : "≈") + " <b>" + pctShown + "</b>, so " + done + " days is <b>" + pctShown + "%</b> of " + TOTAL +
+      " days. Two different methods, same percent as the top of the page.";
+  }
+  // ---------- More math with the same numbers ----------
+  const HOURS_PER_DAY = 6.5; // rough length of a school day, used for the scientific notation section
+  const gcd = (a, b) => b ? gcd(b, a % b) : a;
+  const FR = (top, bottom) => "<span class='fr'><span>" + top + "</span><span>" + bottom + "</span></span>";
+  const XV = "<span class='x'>x</span>";
+  const HOT = s => "<span class='x'>" + s + "</span>";
+  const num = n => n.toLocaleString("en-US");
+  const trim = (n, places) => String(Number(n.toFixed(places)));
+  // rows: [left side, right side, note, optional sign (defaults to "=")]
+  const algHTML = rows => rows.map(([l, r, note, sign]) =>
+    "<div class='l'>" + l + "</div><div class='eqs'>" + (sign || "=") + "</div><div class='r'>" + r + "</div><div class='note'>" + note + "</div>"
+  ).join("");
+  const set = (id, html) => { document.getElementById(id).innerHTML = html; };
+  function primeFactors(n) {
+    const f = [];
+    for (let p = 2; p * p <= n; p++) while (n % p === 0) { f.push(p); n /= p; }
+    if (n > 1) f.push(n);
+    return f;
+  }
+
+  function renderSimplest(done) {
+    if (done === 0) {
+      set("simpAlg", algHTML([[FR(0, TOTAL), "0", "<b>Zero out of anything is zero.</b>"]]));
+      set("simpAnswer", "Check back after the first day of school.");
+      return;
+    }
+    const fT = primeFactors(TOTAL), fD = primeFactors(done);
+    // mark the factors the two numbers share
+    const pool = fT.slice(), shared = [];
+    fD.forEach(p => { const i = pool.indexOf(p); if (i >= 0) { shared.push(p); pool.splice(i, 1); } });
+    const mark = (list) => { const s = shared.slice(); return list.map(p => { const i = s.indexOf(p); if (i >= 0) { s.splice(i, 1); return HOT(p); } return p; }).join(" · "); };
+    const g = gcd(done, TOTAL);
+    const rows = [
+      [TOTAL, mark(fT), "<b>Prime factorization of " + TOTAL + ".</b> Break it into primes with a factor tree."],
+      [done, fD.length === 1 && done > 1 ? done : (done === 1 ? "1" : mark(fD)),
+        fD.length === 1 && done > 1 ? "<b>" + done + " is prime,</b> so it can't be broken down." : "<b>Prime factorization of " + done + ".</b>"],
+      ["GCF", shared.length ? shared.map(HOT).join(" · ") + (shared.length > 1 ? " = " + g : "") : "1",
+        shared.length ? "<b>Multiply the shared factors</b> (in red) to get the greatest common factor." : "<b>No shared factors,</b> so the GCF is 1."]
+    ];
+    if (g > 1) rows.push([FR(done + " ÷ " + g, TOTAL + " ÷ " + g), FR(done / g, TOTAL / g), "<b>Divide the top and bottom by the GCF.</b>"]);
+    else rows.push([FR(done, TOTAL), FR(done, TOTAL), "<b>Already in simplest form,</b> because the GCF is 1."]);
+    set("simpAlg", algHTML(rows));
+    // next day that simplifies to a fraction with a small denominator
+    let milestone = "";
+    for (let d = done + 1; d <= TOTAL; d++) {
+      const gg = gcd(d, TOTAL), den = TOTAL / gg;
+      if (den <= 12) {
+        milestone = " Next nice milestone: day " + d + " (" + fmt(parse(days[d - 1])) + "), when the year is <b>" +
+          (den === 1 ? "all done" : (d / gg) + "/" + den + "</b> done") + (den === 1 ? "</b>." : ".");
+        break;
+      }
+    }
+    set("simpAnswer", (done === TOTAL ? "So " + done + "/" + TOTAL + " = <b>1</b>. The whole year is done."
+      : g === 1 ? "So <b>" + done + "/" + TOTAL + "</b> is already as simple as it gets." : "So " + done + "/" + TOTAL + " = <b>" + (done / g) + "/" + (TOTAL / g) + "</b> of the year is done.") + milestone);
+  }
+
+  function renderRatio(done, left) {
+    if (done === 0 || left === 0) {
+      set("ratioAlg", algHTML([[done + " : " + left, done + " : " + left, "<b>Days done to days left.</b>"]]));
+      set("ratioAnswer", done === 0 ? "No days done yet, so there's nothing to compare. Check back after the first day." : "Every day is done. Enjoy summer!");
+      return;
+    }
+    const g = gcd(done, left);
+    const rows = [
+      [done + " : " + left, (done / g) + " : " + (left / g),
+        g > 1 ? "<b>Divide both parts by the GCF, " + g + ".</b>" + (g === done ? " It starts with 1, so it's also a unit ratio." : "") : "<b>The GCF is 1,</b> so this ratio is already in simplest form."],
+      ...(g === done ? [] : [[done + " : " + left, "1 : " + trim(left / done, 2) + (left % done ? "…" : ""),
+        "<b>Unit ratio.</b> Divide both parts by " + done + " to see how many days are left for every 1 day done."]]),
+      [FR(done, left), FR(done, TOTAL),
+        "<b>Part to part isn't part to whole.</b> Done compared with left is a different fraction from done compared with the whole year.", "≠"]
+    ];
+    set("ratioAlg", algHTML(rows));
+    set("ratioAnswer", done < left
+      ? "For every 1 day done, there are " + (left % done ? "about " : "") + "<b>" + trim(left / done, 1) + "</b> days left."
+      : "For every 1 day left, there are " + (done % left ? "about " : "") + "<b>" + trim(done / left, 1) + "</b> days done. More than halfway!");
+  }
+
+  function renderPie(done) {
+    const deg = done / TOTAL * 360;
+    const cx = 110, cy = 110, r = 95, a = deg * Math.PI / 180;
+    let slice = "";
+    if (done === TOTAL) slice = "<circle cx='" + cx + "' cy='" + cy + "' r='" + r + "' fill='var(--ink)'/>";
+    else if (done > 0) {
+      const x = cx + r * Math.sin(a), y = cy - r * Math.cos(a);
+      slice = "<path d='M" + cx + " " + cy + " L" + cx + " " + (cy - r) + " A" + r + " " + r + " 0 " + (deg > 180 ? 1 : 0) +
+        " 1 " + x.toFixed(2) + " " + y.toFixed(2) + " Z' fill='var(--ink)'/>";
+    }
+    // small red arc showing the angle
+    let arc = "";
+    if (done > 0 && done < TOTAL) {
+      const ar = 30, ax = cx + ar * Math.sin(a), ay = cy - ar * Math.cos(a);
+      arc = "<path d='M" + cx + " " + (cy - ar) + " A" + ar + " " + ar + " 0 " + (deg > 180 ? 1 : 0) + " 1 " + ax.toFixed(2) + " " + ay.toFixed(2) +
+        "' fill='none' stroke='var(--pencil)' stroke-width='5'/>";
+    }
+    set("pieViz",
+      "<svg viewBox='0 0 220 220' role='img' aria-label='Circle graph: " + done + " of " + TOTAL + " school days done, a " + trim(deg, 1) + " degree slice'>" +
+      "<circle cx='" + cx + "' cy='" + cy + "' r='" + r + "' fill='var(--tile-empty)'/>" + slice + arc +
+      "<circle cx='" + cx + "' cy='" + cy + "' r='" + r + "' fill='none' stroke='var(--ink)' stroke-width='3'/></svg>");
+    set("pieAlg", algHTML([
+      [FR(done, TOTAL) + " × 360°", XV, "<b>A full circle is 360°.</b> The slice is the same fraction of the circle as the fraction of the year that's done."],
+      [FR(360, TOTAL), "2", "<b>Shortcut.</b> 360 ÷ " + TOTAL + " = 2, so every school day adds 2° to the slice."],
+      [XV, done + " × 2 = " + HOT(done * 2 + "°"), "<b>Double the days done.</b>"]
+    ]));
+    set("pieAnswer", "The dark slice is <b>" + done * 2 + "°</b>" + (done > 0 && done < TOTAL ? " (the yellow arc marks the angle)" : "") + ". The light part is " + (360 - done * 2) + "°, which is 2 × " + (TOTAL - done) + " days left.");
+  }
+
+  function renderLine(done, left) {
+    const W = 400, H = 320, L0 = 52, R0 = 386, T0 = 16, B0 = 270;
+    const px = x => L0 + x * (R0 - L0) / TOTAL, py = y => B0 - y * (B0 - T0) / TOTAL;
+    let s = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Graph of y = " + TOTAL + " minus x, with today at (" + done + ", " + left + ")'>";
+    for (let v = 0; v <= TOTAL; v += 30) {
+      s += "<line x1='" + px(v) + "' y1='" + T0 + "' x2='" + px(v) + "' y2='" + B0 + "' stroke='var(--rule)'/>";
+      s += "<line x1='" + L0 + "' y1='" + py(v) + "' x2='" + R0 + "' y2='" + py(v) + "' stroke='var(--rule)'/>";
+      if (v % 60 === 0) {
+        s += "<text x='" + px(v) + "' y='" + (B0 + 18) + "' text-anchor='middle'>" + v + "</text>";
+        s += "<text x='" + (L0 - 8) + "' y='" + (py(v) + 4) + "' text-anchor='end'>" + v + "</text>";
+      }
+    }
+    s += "<line x1='" + L0 + "' y1='" + B0 + "' x2='" + R0 + "' y2='" + B0 + "' stroke='var(--ink)' stroke-width='2'/>";
+    s += "<line x1='" + L0 + "' y1='" + T0 + "' x2='" + L0 + "' y2='" + B0 + "' stroke='var(--ink)' stroke-width='2'/>";
+    s += "<line x1='" + px(0) + "' y1='" + py(TOTAL) + "' x2='" + px(TOTAL) + "' y2='" + py(0) + "' stroke='var(--ink)' stroke-width='3'/>";
+    // dashed guides from today's point to each axis
+    s += "<path d='M" + px(done) + " " + B0 + " V" + py(left) + " H" + L0 + "' fill='none' stroke='var(--margin)' stroke-width='1.5' stroke-dasharray='4 4'/>";
+    s += "<circle cx='" + px(done) + "' cy='" + py(left) + "' r='6' fill='var(--margin)' stroke='#fff' stroke-width='2'/>";
+    const right = done < 120;
+    s += "<text class='hot' x='" + (px(done) + (right ? 12 : -12)) + "' y='" + (py(left) - 10) + "' text-anchor='" + (right ? "start" : "end") + "'>today (" + done + ", " + left + ")</text>";
+    s += "<text class='lab' x='" + ((L0 + R0) / 2) + "' y='" + (H - 6) + "' text-anchor='middle'>x = school days done</text>";
+    s += "<text class='lab' x='14' y='" + ((T0 + B0) / 2) + "' text-anchor='middle' transform='rotate(-90 14 " + ((T0 + B0) / 2) + ")'>y = school days left</text>";
+    s += "</svg>";
+    set("lineViz", s);
+    set("lineAlg", algHTML([
+      ["y", TOTAL + " − " + XV, "<b>The equation.</b> Days left equals the total minus days done."],
+      ["slope", "−1", "<b>Rate of change.</b> Every school day, x goes up 1 and y goes down 1."],
+      ["y-intercept", "(0, " + TOTAL + ")", "<b>Where the line starts.</b> Before the first day, all " + TOTAL + " days were left."],
+      ["x-intercept", "(" + TOTAL + ", 0)", "<b>Where the line ends.</b> After " + TOTAL + " days, none are left."],
+      ["y", TOTAL + " − " + HOT(done) + " = " + HOT(left), "<b>Plug in today.</b> Put " + done + " in for x."]
+    ]));
+    set("lineAnswer", "Today is the point <b>(" + done + ", " + left + ")</b> on the line. Tomorrow's point will be one step down and to the right.");
+  }
+
+  function renderRate(left, calLeft) {
+    if (left === 0) {
+      set("rateAlg", "");
+      set("rateAnswer", "No school days left, so there's no rate to find. See you in August!");
+      return;
+    }
+    const rate = calLeft / left, back = left / calLeft;
+    set("rateAlg", algHTML([
+      [FR(calLeft, left), XV, "<b>Set up the rate.</b> " + calLeft + " calendar days until the last day, over " + left + " school days left."],
+      [XV, HOT(trim(rate, 2)), "<b>Divide " + calLeft + " ÷ " + left + " to get a unit rate:</b> calendar days for each 1 school day.", Number(trim(rate, 2)) === rate ? "=" : "≈"],
+      [FR(left, calLeft), trim(back, 2) + " ≈ " + Math.round(back * 100) + "%", "<b>Flip it.</b> School days per calendar day, as a decimal and a percent.", Number(trim(back, 2)) === back ? "=" : "≈"]
+    ]));
+    set("rateAnswer", "Each school day left comes with about <b>" + trim(rate, 2) + "</b> calendar days, because weekends and breaks are mixed in. Only about <b>" +
+      Math.round(back * 100) + "%</b> of the days until the last day are school days.");
+  }
+
+  function renderSci(left) {
+    const hours = left * HOURS_PER_DAY, secs = hours * 3600;
+    if (secs === 0) {
+      set("sciAlg", "");
+      set("sciAnswer", "Zero seconds of school left. That's 0 in any notation!");
+      return;
+    }
+    const exp = Math.floor(Math.log10(secs)), coef = secs / Math.pow(10, exp);
+    set("sciAlg", algHTML([
+      [left + " × " + HOURS_PER_DAY, num(hours) + " h", "<b>Days to hours (h),</b> figuring about " + HOURS_PER_DAY + " hours of school a day."],
+      [num(hours) + " × 3,600", num(secs) + " s", "<b>Hours to seconds (s).</b> 60 minutes × 60 seconds = 3,600 seconds in an hour."],
+      [num(secs), HOT(trim(coef, 4)) + " × 10<sup>" + exp + "</sup>", "<b>Scientific notation.</b> Move the decimal point " + exp + " places left so one digit is in front, and multiply by 10<sup>" + exp + "</sup>."]
+    ]));
+    set("sciAnswer", "About <b>" + trim(coef, 1) + " × 10<sup>" + exp + "</sup></b> seconds of school left. Every day that ends takes away " + num(HOURS_PER_DAY * 3600) + " seconds.");
+  }
+
+  function renderProb(left, monLeft) {
+    if (left === 0) {
+      set("probAlg", "");
+      set("probAnswer", "No school days left to pick from.");
+      return;
+    }
+    const g = gcd(monLeft, left) || 1, p = monLeft / left;
+    const rows = [
+      ["P(Monday)", FR(monLeft, left), "<b>Favorable over total.</b> Mondays left out of all school days left."]
+    ];
+    if (g > 1) rows.push(["", FR(monLeft / g, left / g), "<b>Simplify</b> by dividing both by " + g + "."]);
+    const pExact = Number(trim(p, 3)) === p;
+    rows.push(["", trim(p, 3) + (pExact ? " = " : " ≈ ") + HOT(trim(p * 100, 1) + "%"), "<b>Decimal and percent.</b> Divide, then multiply by 100.", pExact ? "=" : "≈"]);
+    rows.push(["full weeks", FR(1, 5) + " = 20%", "<b>Compare.</b> If every week had 5 school days, 1 of every 5 would be a Monday."]);
+    set("probAlg", algHTML(rows));
+    set("probAnswer", monLeft === 0
+      ? "No school Mondays are left, so the probability is <b>0</b>."
+      : "If you pick one remaining school day at random, the chance it's a Monday is " + (pExact ? "" : "about ") + "<b>" + trim(p * 100, 1) + "%</b>. " +
+        (p < 0.2 ? "That's less than 20% because Monday holidays like MLK Day and Presidents' Day take some away." : "That's at or above 20% for these remaining weeks."));
+  }
+
+
+  // ---------- Even more math ----------
+  const INT = n => n < 0 ? "−" + Math.abs(n) : String(n);   // real minus sign
+  const PINT = n => n < 0 ? "(" + INT(n) + ")" : String(n); // parentheses around negatives
+  const YES = "<span class='yes'>✓ yes</span>", NO = "<span class='no'>✗ no</span>";
+  const addDays = (k, n) => { const d = parse(k); d.setDate(d.getDate() + n); return key(d); };
+  const between = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
+
+  function renderDivisibility(n) {
+    if (n <= 1) {
+      set("divAlg", "");
+      set("divAnswer", n === 1 ? "1 is neither prime nor composite. It has only one factor: itself." : "0 is divisible by every whole number (except 0), but it isn't prime or composite.");
+      return;
+    }
+    const d = String(n).split("").map(Number);
+    const sum = d.reduce((a, b) => a + b, 0);
+    const sumTxt = d.join(" + ") + " = " + sum;
+    const last = d[d.length - 1], last2 = n % 100;
+    const rows = [
+      ["by 2", n % 2 === 0 ? YES : NO, "Last digit is " + last + (last % 2 === 0 ? ", which is even." : ", which is odd.")],
+      ["by 3", n % 3 === 0 ? YES : NO, "Digit sum: " + sumTxt + (sum % 3 === 0 ? ", a multiple of 3." : ", not a multiple of 3.")],
+      ["by 4", n % 4 === 0 ? YES : NO, "Last two digits: " + last2 + (last2 % 4 === 0 ? " is a multiple of 4." : " isn't a multiple of 4.")],
+      ["by 5", n % 5 === 0 ? YES : NO, "Last digit is " + last + (last % 5 === 0 ? "." : ", not 0 or 5.")],
+      ["by 6", n % 6 === 0 ? YES : NO, "Needs to pass both the 2 and 3 tests."],
+      ["by 9", n % 9 === 0 ? YES : NO, "Digit sum " + sum + (sum % 9 === 0 ? " is a multiple of 9." : " isn't a multiple of 9.")],
+      ["by 10", n % 10 === 0 ? YES : NO, "Last digit is " + last + (last === 0 ? "." : ", not 0.")]
+    ];
+    set("divAlg", algHTML(rows.map(r => [n + " ÷ " + r[0].slice(3), r[1], r[2], "→"])));
+    const pairs = [];
+    for (let a = 1; a * a <= n; a++) if (n % a === 0) pairs.push(a + " × " + (n / a));
+    const count = pairs.reduce((c, pr) => { const [a, b] = pr.split(" × ").map(Number); return c + (a === b ? 1 : 2); }, 0);
+    set("divAnswer", "Factor pairs of " + n + ": <b>" + pairs.join(", ") + "</b>. That's " + count + " factors, so " + n +
+      (count === 2 ? " is <b>prime</b>." : " is <b>composite</b>."));
+  }
+
+  function renderSqrt(n) {
+    if (n === 0) { set("sqrtAlg", ""); set("sqrtAnswer", "√0 = 0. No days left!"); return; }
+    const r = Math.floor(Math.sqrt(n)), lo = r * r, hi = (r + 1) * (r + 1);
+    if (lo === n) {
+      set("sqrtAlg", algHTML([[r + "<sup>2</sup>", String(n), "<b>" + n + " is a perfect square.</b>"], ["√" + n, HOT(r), "<b>So the square root is a whole number.</b>"]]));
+      set("sqrtAnswer", "Today's number is a <b>perfect square</b>: " + r + " × " + r + " = " + n + ".");
+      return;
+    }
+    const est = r + (n - lo) / (hi - lo), real = Math.sqrt(n);
+    set("sqrtAlg", algHTML([
+      [r + "<sup>2</sup>", String(lo), "<b>The perfect square just below " + n + ".</b>"],
+      [(r + 1) + "<sup>2</sup>", String(hi), "<b>The perfect square just above " + n + ".</b>"],
+      [String(r), "√" + n + " &lt; " + (r + 1), "<b>So √" + n + " is between " + r + " and " + (r + 1) + ".</b> " + n + " isn't a perfect square, so its root is irrational.", "&lt;"],
+      ["√" + n, r + " + " + FR(n - lo, hi - lo) + " ≈ " + trim(est, 2), "<b>Estimate.</b> " + n + " is " + (n - lo) + " of the " + (hi - lo) + " steps from " + lo + " to " + hi + ".", "≈"],
+      ["√" + n, HOT(trim(real, 2)), "<b>Check with a calculator.</b> " + trim(real, 2) + " × " + trim(real, 2) + " ≈ " + trim(Number(real.toFixed(2)) ** 2, 2) + ".", "≈"]
+    ]));
+    set("sqrtAnswer", "√" + n + " is closer to <b>" + (n - lo < hi - n ? r : r + 1) + "</b>, because " + n + " is " +
+      (n - lo) + " away from " + lo + " and " + (hi - n) + " away from " + hi + ".");
+  }
+
+  function renderWeeks(left, calLeft) {
+    if (left === 0) { set("weeksAlg", ""); set("weeksAnswer", "Zero weeks left. Summer's here!"); return; }
+    const q = Math.floor(left / 5), r = left % 5;
+    const rows = [
+      [left + " ÷ 5", q + (r ? " R " + r : ""), "<b>Divide by 5,</b> since a full school week has 5 days."],
+      [FR(left, 5), r ? q + " " + FR(r, 5) : String(q), r ? "<b>As a mixed number,</b> the remainder goes over the divisor." : "<b>No remainder,</b> so it's a whole number of weeks."],
+    ];
+    if (r) rows.push([FR(left, 5), trim(left / 5, 1), "<b>As a decimal.</b>"]);
+    if (calLeft > 0) rows.push([calLeft + " ÷ 7", trim(calLeft / 7, 1), "<b>Calendar weeks</b> until the last day, for comparison.", "≈"]);
+    set("weeksAlg", algHTML(rows));
+    set("weeksAnswer", "That's <b>" + q + " full school week" + (q === 1 ? "" : "s") + (r ? " and " + r + " day" + (r === 1 ? "" : "s") : "") + "</b>" +
+      (calLeft > 0 ? ", spread across about " + Math.ceil(calLeft / 7) + " calendar weeks. The extra weeks are holidays and breaks." : "."));
+  }
+
+  function renderMilestones(done) {
+    const rows = [25, 50, 75, 90].map(p => {
+      const d = p * TOTAL / 100, date = fmt(parse(days[d - 1]));
+      const status = done >= d ? "<b>Done</b> on " + date + "." : "<b>Day " + d + ", " + date + ".</b> " + (d - done) + " school day" + (d - done === 1 ? "" : "s") + " away.";
+      return [p + "% of " + TOTAL, trim(p / 100, 2) + " × " + TOTAL + " = " + (done >= d ? d : HOT(d)), status];
+    });
+    rows.push(
+      [TOTAL + " − " + XV, "30", "<b>Inequality:</b> when will fewer than 30 days be left?", "&lt;"],
+      ["−" + XV, "−" + (TOTAL - 30), "<b>Subtract " + TOTAL + " from both sides.</b>", "&lt;"],
+      [XV, HOT(TOTAL - 30), "<b>Divide both sides by −1,</b> and flip the inequality sign.", "&gt;"]
+    );
+    set("mileAlg", algHTML(rows));
+    const fs = TOTAL - 29; // first whole number greater than 150
+    set("mileAnswer", done === TOTAL ? "Every milestone is done. That's the whole year!" : done >= fs
+      ? "You're in the final stretch: fewer than 30 days left."
+      : "The final stretch starts once day <b>" + fs + "</b> (" + fmt(parse(days[fs - 1])) + ") is done.");
+  }
+
+  function renderChange(left, todayKey, t0) {
+    const agoKey = addDays(key(t0), -30);
+    const leftAgo = TOTAL - days.filter(k => k <= agoKey).length;
+    const change = left - leftAgo;
+    if (change === 0 || leftAgo === 0) {
+      set("chgAlg", algHTML([["days left 30 days ago", String(leftAgo), "On " + fmt(parse(agoKey)) + "."], ["days left now", String(left), ""]]));
+      set("chgAnswer", "No change over the last 30 days, so the percent change is <b>0%</b>.");
+      return;
+    }
+    const pct = change / leftAgo * 100;
+    set("chgAlg", algHTML([
+      ["old", String(leftAgo), "<b>Days left 30 days ago</b> (after " + fmt(parse(agoKey)) + ")."],
+      ["new", String(left), "<b>Days left now.</b>"],
+      ["change", left + " − " + leftAgo + " = " + INT(change), "<b>New minus old.</b> Negative means it went down."],
+      ["% change", FR(INT(change), leftAgo) + " × 100", "<b>Divide the change by the original amount,</b> then multiply by 100."],
+      ["", HOT(INT(Number(pct.toFixed(1))) + "%"), "<b>Rounded to one decimal place.</b>", "≈"]
+    ]));
+    set("chgAnswer", (left === 0 ? "Days left <b>decreased by 100%</b>. They're all gone!" : "Days left <b>decreased by about " + trim(-pct, 1) + "%</b> in the last 30 days. The percent change tends to grow each month because the original amount keeps shrinking."));
+  }
+
+  function renderNumberLine(t0) {
+    const tk = key(t0);
+    const pts = [
+      ["First day", FIRST], ["Thanksgiving", "2026-11-23"], ["Winter break", "2026-12-21"],
+      ["Spring break", "2027-03-22"], ["Last day", LAST]
+    ].map(([name, k]) => ({ name, v: between(tk, k) }));
+    const all = pts.concat([{ name: "Today", v: 0, today: true }]).sort((a, b) => a.v - b.v);
+    const minV = Math.min(...all.map(p => p.v)), maxV = Math.max(...all.map(p => p.v));
+    const W = 620, H = 190, L0 = 30, R0 = 590, Y = 95;
+    const px = v => L0 + (v - minV) / (maxV - minV || 1) * (R0 - L0);
+    const step = [25, 50, 100].find(st => (maxV - minV) / st <= 8) || 100;
+    let svg = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Number line of calendar days from today'>";
+    svg += "<line x1='" + (L0 - 14) + "' y1='" + Y + "' x2='" + (R0 + 14) + "' y2='" + Y + "' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<path d='M" + (L0 - 20) + " " + Y + " l8 -5 v10 Z M" + (R0 + 20) + " " + Y + " l-8 -5 v10 Z' fill='var(--ink)'/>";
+    for (let v = Math.ceil(minV / step) * step; v <= maxV; v += step) {
+      svg += "<line x1='" + px(v) + "' y1='" + (Y - 5) + "' x2='" + px(v) + "' y2='" + (Y + 5) + "' stroke='var(--ink)'/>";
+    }
+    const levels = [-38, 38, -70, 70];
+    all.forEach((p, i) => {
+      const x = px(p.v);
+      const lv = levels[i % 4];
+      const ty = Y + lv;
+      const col = p.today ? "var(--margin)" : "var(--ink)";
+      svg += "<line x1='" + x + "' y1='" + Y + "' x2='" + x + "' y2='" + (ty + (lv < 0 ? 6 : -18)) + "' stroke='" + col + "' stroke-dasharray='2 3'/>";
+      svg += "<circle cx='" + x + "' cy='" + Y + "' r='6' fill='" + col + "' stroke='#fff' stroke-width='2'/>";
+      const anchor = x < L0 + 40 ? "start" : x > R0 - 40 ? "end" : "middle";
+      svg += "<text class='" + (p.today ? "hot" : "lab") + "' x='" + x + "' y='" + (ty - (lv < 0 ? 10 : -2)) + "' text-anchor='" + anchor + "'>" + p.name + "</text>";
+      svg += "<text x='" + x + "' y='" + (ty + (lv < 0 ? 4 : 14)) + "' text-anchor='" + anchor + "'>" + INT(p.v) + "</text>";
+    });
+    svg += "</svg>";
+    set("nlViz", svg);
+    const a = pts[0].v, b = pts[4].v;
+    const rows = [
+      ["first day", INT(a), a < 0 ? "<b>Negative:</b> it was " + (-a) + " days ago." : "<b>Positive:</b> it's " + a + " days from now."],
+      ["last day", INT(b), b < 0 ? "<b>Negative:</b> it was " + (-b) + " days ago." : "<b>Positive:</b> it's " + b + " days from now."],
+      ["|" + INT(a) + "|", String(Math.abs(a)), "<b>Absolute value</b> is the distance from 0, so it's never negative."],
+      ["distance", INT(b) + " − " + PINT(a), "<b>Right end minus left end.</b>"]
+    ];
+    if (a < 0) rows.push(["", INT(b) + " + " + (-a), "<b>Subtracting a negative is the same as adding.</b>"]);
+    rows.push(["", HOT(b - a), "<b>The distance</b> from the first day to the last day."]);
+    set("nlAlg", algHTML(rows));
+    set("nlAnswer", "Today is 0, the past is negative, and the future is positive. The school year stretches <b>" + (b - a) + "</b> calendar days from end to end.");
+  }
+
+  const MONTHS = (() => {
+    const m = {};
+    days.forEach((k, i) => { const mk = k.slice(0, 7); (m[mk] = m[mk] || []).push(i); });
+    return Object.keys(m).map(mk => ({ mk, name: parse(mk + "-01").toLocaleDateString("en-US", { month: "short" }), idx: m[mk] }));
+  })();
+
+  function renderStats(done) {
+    const vals = MONTHS.map(m => m.idx.length), n = vals.length;
+    const mean = vals.reduce((a, b) => a + b, 0) / n;
+    const sorted = vals.slice().sort((a, b) => a - b);
+    const med = n % 2 ? sorted[(n - 1) / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+    const freq = {}; vals.forEach(v => freq[v] = (freq[v] || 0) + 1);
+    const top = Math.max(...Object.values(freq));
+    const modes = top > 1 ? Object.keys(freq).filter(v => freq[v] === top).map(Number) : [];
+    const range = sorted[n - 1] - sorted[0];
+    const devs = vals.map(v => Math.abs(v - mean)), mad = devs.reduce((a, b) => a + b, 0) / n;
+
+    // bar chart: dark part = done days in that month
+    const W = 620, H = 250, L0 = 36, R0 = 548, T0 = 14, B0 = 210, maxY = 25;
+    const bw = (R0 - L0) / n, py = v => B0 - v * (B0 - T0) / maxY;
+    let svg = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Bar chart of school days per month'>";
+    for (let v = 0; v <= maxY; v += 5) {
+      svg += "<line x1='" + L0 + "' y1='" + py(v) + "' x2='" + R0 + "' y2='" + py(v) + "' stroke='var(--rule)'/>";
+      svg += "<text x='" + (L0 - 8) + "' y='" + (py(v) + 4) + "' text-anchor='end'>" + v + "</text>";
+    }
+    MONTHS.forEach((m, i) => {
+      const x = L0 + i * bw + bw * 0.18, w = bw * 0.64, v = m.idx.length;
+      const d = m.idx.filter(ix => ix < done).length;
+      svg += "<rect x='" + x + "' y='" + py(v) + "' width='" + w + "' height='" + (B0 - py(v)) + "' fill='var(--tile-empty)' stroke='var(--ink)' stroke-width='2'/>";
+      if (d) svg += "<rect x='" + x + "' y='" + py(d) + "' width='" + w + "' height='" + (B0 - py(d)) + "' fill='var(--ink)'/>";
+      svg += "<text class='lab' x='" + (x + w / 2) + "' y='" + (py(v) - 6) + "' text-anchor='middle'>" + v + "</text>";
+      svg += "<text x='" + (x + w / 2) + "' y='" + (B0 + 18) + "' text-anchor='middle'>" + m.name + "</text>";
+    });
+    svg += "<line x1='" + L0 + "' y1='" + py(mean) + "' x2='" + R0 + "' y2='" + py(mean) + "' stroke='var(--margin)' stroke-width='2.5' stroke-dasharray='7 5'/>";
+    svg += "<text class='hot' x='" + (R0 + 6) + "' y='" + (py(mean) + 5) + "' text-anchor='start'>mean " + trim(mean, 1) + "</text>";
+    svg += "<line x1='" + L0 + "' y1='" + B0 + "' x2='" + R0 + "' y2='" + B0 + "' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<text x='" + L0 + "' y='" + (H - 4) + "'>Dark part of each bar = school days already done</text></svg>";
+    set("statViz", svg);
+
+    set("statAlg", algHTML([
+      ["data", n + " values", "<b>Monthly counts, least to greatest:</b> " + sorted.join(", ") + "."],
+      ["mean", FR(TOTAL, n) + " = " + HOT(trim(mean, 1)), "<b>Add them all up (" + TOTAL + ") and divide by how many (" + n + ").</b>"],
+      ["median", n % 2 ? String(med) : FR(sorted[n / 2 - 1] + " + " + sorted[n / 2], 2) + " = " + trim(med, 1),
+        n % 2 ? "<b>The middle value.</b>" : "<b>Even number of values,</b> so average the two in the middle."],
+      ["mode", modes.length ? (modes.length > 2 ? modes.slice(0, -1).join(", ") + ", and " + modes[modes.length - 1] : modes.join(" and ")) : "none", modes.length ? "<b>The most common value,</b> appearing " + top + " times." : "<b>No value repeats.</b>"],
+      ["range", sorted[n - 1] + " − " + sorted[0] + " = " + range, "<b>Greatest minus least.</b>"],
+      ["total distance", trim(devs.reduce((a, b) => a + b, 0), 1), "<b>Add up how far each month is from the mean of " + trim(mean, 1) + ":</b> " + devs.map(d => trim(d, 1)).join(" + ") + "."],
+      ["MAD", FR(trim(devs.reduce((a, b) => a + b, 0), 1), n) + " = " + HOT(trim(mad, 1)),
+        "<b>Mean absolute deviation.</b> Average those distances. On average, a month is " + trim(mad, 1) + " school days away from the mean."]
+    ]));
+    const minM = MONTHS.filter(m => m.idx.length === sorted[0]).map(m => m.name).join(" and ");
+    const maxM = MONTHS.filter(m => m.idx.length === sorted[n - 1]).map(m => m.name).join(" and ");
+    set("statAnswer", "The busiest month" + (maxM.includes(" and ") ? "s are " : " is ") + "<b>" + maxM + "</b> (" + sorted[n - 1] +
+      " days). The lightest " + (minM.includes(" and ") ? "are " : "is ") + "<b>" + minM + "</b> (" + sorted[0] + " days), because of a late start, holidays, or a break.");
+  }
+
+
+  // ---------- Still more math ----------
+  const sciParts = n => { const e = Math.floor(Math.log10(n)); return { c: n / Math.pow(10, e), e }; };
+  const SCI = (c, e, places) => trim(c, places) + " × 10<sup>" + INT(e) + "</sup>";
+
+  function renderDecimal(done) {
+    const g = gcd(done, TOTAL) || TOTAL, a = done / g, b = TOTAL / g;
+    // long division, watching for a remainder we've seen before
+    let rem = a % b; const whole = Math.floor(a / b), digs = [], seen = {};
+    while (rem !== 0 && !(rem in seen)) { seen[rem] = digs.length; rem *= 10; digs.push(Math.floor(rem / b)); rem %= b; }
+    const repeats = rem !== 0;
+    const start = repeats ? seen[rem] : digs.length;
+    const shown = whole + (digs.length ? "." + digs.slice(0, start).join("") + (repeats ? "<span class='rep'>" + digs.slice(start).join("") + "</span>" : "") : "");
+    const bf = primeFactors(b);
+    const others = bf.filter(f => f !== 2 && f !== 5);
+    const rows = [
+      [FR(done, TOTAL), b === 1 ? String(a) : FR(a, b), g > 1 ? "<b>Simplify first</b> (divide by the GCF, " + g + ")." : "<b>Already in simplest form.</b>"]
+    ];
+    if (b > 1) rows.push(["denominator " + b, bf.map(f => f === 2 || f === 5 ? f : HOT(f)).join(" · "),
+      others.length ? "<b>Factor the denominator.</b> The red factors aren't 2 or 5." : "<b>Factor the denominator.</b> Only 2s and 5s."]);
+    rows.push([FR(a, b), HOT(shown), repeats ? "<b>Divide.</b> The bar shows the digits that repeat forever." : "<b>Divide.</b> The division ends with no remainder."]);
+    set("decAlg", algHTML(rows));
+    set("decAnswer", b === 1 ? "A whole number, so there's no decimal part at all."
+      : others.length ? "The denominator has a factor of " + [...new Set(others)].join(" and ") + ", so the decimal is <b>repeating</b>. A simplified fraction only terminates when its denominator's only prime factors are 2 and 5."
+      : "The denominator's only prime factors are 2 and 5, so the decimal <b>terminates</b>.");
+  }
+
+  function renderSystem(done, left) {
+    const D = done - left;
+    set("sysAlg", algHTML([
+      [XV + " + y", String(TOTAL), "<b>Equation 1.</b> Days done (x) plus days left (y) is the whole year."],
+      [XV + " − y", INT(D), "<b>Equation 2.</b> Today, days done minus days left is " + INT(D) + (D < 0 ? " (negative because more days are left than done)." : ".")],
+      ["2" + XV, TOTAL + " + " + PINT(D) + " = " + (TOTAL + D), "<b>Add the equations.</b> The +y and −y cancel out. That's elimination."],
+      [XV, FR(TOTAL + D, 2) + " = " + HOT(done), "<b>Divide both sides by 2.</b>"],
+      ["y", TOTAL + " − " + done + " = " + HOT(left), "<b>Substitute</b> x = " + done + " back into Equation 1."]
+    ]));
+    set("sysAnswer", "The solution is <b>(" + done + ", " + left + ")</b>: " + done + (done === 1 ? " day" : " days") + " done and " + left + (left === 1 ? " day" : " days") + " left. Check it: " +
+      done + " + " + left + " = " + TOTAL + " and " + done + " − " + left + " = " + INT(D) + ". Both equations are true.");
+  }
+
+  function renderProp(done) {
+    const k = HOURS_PER_DAY, maxX = TOTAL, maxY = TOTAL * k;
+    const W = 400, H = 300, L0 = 56, R0 = 386, T0 = 16, B0 = 252;
+    const px = x => L0 + x * (R0 - L0) / maxX, py = y => B0 - y * (B0 - T0) / maxY;
+    let svg = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Graph of y = " + k + "x through the origin'>";
+    for (let v = 0; v <= maxX; v += 30) svg += "<line x1='" + px(v) + "' y1='" + T0 + "' x2='" + px(v) + "' y2='" + B0 + "' stroke='var(--rule)'/>";
+    for (let v = 0; v <= maxY; v += 200) {
+      svg += "<line x1='" + L0 + "' y1='" + py(v) + "' x2='" + R0 + "' y2='" + py(v) + "' stroke='var(--rule)'/>";
+      svg += "<text x='" + (L0 - 8) + "' y='" + (py(v) + 4) + "' text-anchor='end'>" + num(v) + "</text>";
+    }
+    for (let v = 0; v <= maxX; v += 60) svg += "<text x='" + px(v) + "' y='" + (B0 + 18) + "' text-anchor='middle'>" + v + "</text>";
+    svg += "<line x1='" + L0 + "' y1='" + B0 + "' x2='" + R0 + "' y2='" + B0 + "' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<line x1='" + L0 + "' y1='" + T0 + "' x2='" + L0 + "' y2='" + B0 + "' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<line x1='" + px(0) + "' y1='" + py(0) + "' x2='" + px(maxX) + "' y2='" + py(maxY) + "' stroke='var(--ink)' stroke-width='3'/>";
+    svg += "<circle cx='" + px(0) + "' cy='" + py(0) + "' r='5' fill='var(--ink)'/>";
+    svg += "<circle cx='" + px(1) + "' cy='" + py(k) + "' r='4' fill='var(--pencil)' stroke='var(--ink)'/>";
+    svg += "<circle cx='" + px(done) + "' cy='" + py(done * k) + "' r='6' fill='var(--margin)' stroke='#fff' stroke-width='2'/>";
+    const right = done < 110;
+    svg += "<text class='hot' x='" + (px(done) + (right ? 12 : -12)) + "' y='" + (py(done * k) + (right ? 16 : -10)) + "' text-anchor='" + (right ? "start" : "end") + "'>today (" + done + ", " + num(done * k) + ")</text>";
+    svg += "<text class='lab' x='" + ((L0 + R0) / 2) + "' y='" + (H - 8) + "' text-anchor='middle'>x = school days done</text>";
+    svg += "<text class='lab' x='14' y='" + ((T0 + B0) / 2) + "' text-anchor='middle' transform='rotate(-90 14 " + ((T0 + B0) / 2) + ")'>y = hours in school</text></svg>";
+    set("prop2Viz", svg);
+    const xs = [1, 2, 5, 10].filter(x => x !== done);
+    const rows = xs.map(x => [FR(num(x * k), x), String(k), "<b>" + x + " day" + (x === 1 ? "" : "s") + ", " + num(x * k) + " hours.</b> Hours ÷ days."]);
+    rows.push(
+      ["k", String(k), "<b>Every ratio is the same,</b> so the relationship is proportional. k is the constant of proportionality."],
+      ["y", k + XV, "<b>The equation</b> is y = kx. The graph is a straight line through (0, 0), and (1, " + k + ") is the unit rate."],
+      ["y", k + " × " + HOT(done) + " = " + HOT(num(done * k)), "<b>Plug in today's days done.</b>"]
+    );
+    set("prop2Alg", algHTML(rows));
+    set("prop2Answer", "At about " + k + " hours a day, you've spent about <b>" + num(done * k) + " hours</b> in school this year.");
+  }
+
+  function renderRect(done) {
+    const pairs = [];
+    for (let a = 1; a * a <= TOTAL; a++) if (TOTAL % a === 0) pairs.push([a, TOTAL / a]);
+    const [h, w] = pairs[pairs.length - 1]; // the most square one (12 × 15)
+    const cell = 20, ox = 26, oy = 24;
+    let svg = "<svg viewBox='0 0 " + (ox + w * cell + 40) + " " + (oy + h * cell + 8) + "' role='img' aria-label='" + h + " by " + w + " rectangle of " + TOTAL + " tiles, " + done + " filled in'>";
+    for (let i = 0; i < TOTAL; i++) {
+      const r = Math.floor(i / w), c = i % w;
+      svg += "<rect x='" + (ox + c * cell + 1) + "' y='" + (oy + r * cell + 1) + "' width='" + (cell - 2) + "' height='" + (cell - 2) + "' rx='3' fill='" + (i < done ? "var(--ink)" : "var(--tile-empty)") + "'/>";
+    }
+    svg += "<rect x='" + ox + "' y='" + oy + "' width='" + w * cell + "' height='" + h * cell + "' fill='none' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<line x1='" + ox + "' y1='" + oy + "' x2='" + (ox + w * cell) + "' y2='" + (oy + h * cell) + "' stroke='var(--margin)' stroke-width='2.5' stroke-dasharray='6 4'/>";
+    svg += "<text class='lab' x='" + (ox + w * cell / 2) + "' y='" + (oy - 8) + "' text-anchor='middle'>" + w + "</text>";
+    svg += "<text class='lab' x='" + (ox - 8) + "' y='" + (oy + h * cell / 2 + 4) + "' text-anchor='end'>" + h + "</text></svg>";
+    set("rectViz", svg);
+    const diag2 = h * h + w * w, fullRows = Math.floor(done / w), extra = done % w;
+    set("rectAlg", algHTML([
+      ["A", h + " × " + w + " = " + TOTAL, "<b>Area (A):</b> one square tile per school day. " + h + " × " + w + " is the most square way to arrange " + TOTAL + " tiles."],
+      ["P", "2(" + h + " + " + w + ") = " + 2 * (h + w), "<b>Perimeter (P) of the " + h + " × " + w + " rectangle.</b> Add the length and width, then double it. This is the smallest perimeter any " + TOTAL + "-tile rectangle can have."],
+      ["P", "2(1 + " + TOTAL + ") = " + 2 * (1 + TOTAL), "<b>Perimeter of a 1 × " + TOTAL + " rectangle.</b> Same area, but a much bigger perimeter when the rectangle is long and skinny."],
+      ["d", "√(" + h + "<sup>2</sup> + " + w + "<sup>2</sup>)", "<b>Diagonal (d), with the Pythagorean theorem.</b> The dashed diagonal is the hypotenuse of a right triangle."],
+      ["", "√" + diag2 + " ≈ " + HOT(trim(Math.sqrt(diag2), 1)), "<b>" + h * h + " + " + w * w + " = " + diag2 + ",</b> then take the square root.", "≈"],
+      ["done", done ? fullRows + " × " + w + (extra ? " + " + extra : "") + " = " + done : "0",
+        "<b>Filled area.</b> " + fullRows + " full row" + (fullRows === 1 ? "" : "s") + " of " + w + (extra ? " plus " + extra + " more tile" + (extra === 1 ? "" : "s") : "") + "."]
+    ]));
+    set("rectAnswer", "Every rectangle with an area of " + TOTAL + ": " +
+      pairs.map(([a, b]) => a + " × " + b + " (P = " + 2 * (a + b) + ")").join(", ") + ". Same area, very different perimeters.");
+  }
+
+  function renderSector(done) {
+    const r = 10, PI = 3.14, frac = done / TOTAL, deg = done * 2;
+    const area = PI * r * r, circ = 2 * PI * r;
+    set("sectAlg", algHTML([
+      ["area of circle", "3.14 × 10<sup>2</sup> = " + trim(area, 2) + " cm<sup>2</sup>", "<b>A = πr<sup>2</sup>,</b> if the circle graph had a 10 cm radius (π ≈ 3.14)."],
+      ["slice area", FR(deg, 360) + " × " + trim(area, 2) + " ≈ " + HOT(trim(area * frac, 1) + " cm<sup>2</sup>"), "<b>The slice gets the same fraction of the area</b> as its angle is of 360°."],
+      ["circumference", "2 × 3.14 × 10 = " + trim(circ, 1) + " cm", "<b>C = 2πr.</b>"],
+      ["arc length", FR(deg, 360) + " × " + trim(circ, 1) + " ≈ " + HOT(trim(circ * frac, 1) + " cm"), "<b>The curved edge of the slice</b> is the same fraction of the circumference."]
+    ]));
+    set("sectAnswer", "The done slice covers about <b>" + trim(area * frac, 1) + " cm<sup>2</sup></b>, and its curved edge is about <b>" +
+      trim(circ * frac, 1) + " cm</b> long.");
+  }
+
+  function renderBox() {
+    const vals = MONTHS.map(m => m.idx.length).sort((a, b) => a - b), n = vals.length;
+    const med = arr => { const m = arr.length; return m % 2 ? arr[(m - 1) / 2] : (arr[m / 2 - 1] + arr[m / 2]) / 2; };
+    const lower = vals.slice(0, Math.floor(n / 2)), upper = vals.slice(Math.ceil(n / 2));
+    const mn = vals[0], q1 = med(lower), q2 = med(vals), q3 = med(upper), mx = vals[n - 1], iqr = q3 - q1;
+    const lo = Math.floor(mn / 2) * 2 - 2, hi = Math.ceil(mx / 2) * 2 + 2;
+    const W = 620, H = 150, L0 = 30, R0 = 590, Y = 60;
+    const px = v => L0 + (v - lo) / (hi - lo) * (R0 - L0);
+    let svg = "<svg viewBox='0 0 " + W + " " + H + "' role='img' aria-label='Box plot: min " + mn + ", Q1 " + q1 + ", median " + q2 + ", Q3 " + q3 + ", max " + mx + "'>";
+    svg += "<line x1='" + px(mn) + "' y1='" + Y + "' x2='" + px(q1) + "' y2='" + Y + "' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<line x1='" + px(q3) + "' y1='" + Y + "' x2='" + px(mx) + "' y2='" + Y + "' stroke='var(--ink)' stroke-width='2'/>";
+    [mn, mx].forEach(v => svg += "<line x1='" + px(v) + "' y1='" + (Y - 14) + "' x2='" + px(v) + "' y2='" + (Y + 14) + "' stroke='var(--ink)' stroke-width='2'/>");
+    svg += "<rect x='" + px(q1) + "' y='" + (Y - 28) + "' width='" + (px(q3) - px(q1)) + "' height='56' fill='var(--pencil)' stroke='var(--ink)' stroke-width='2'/>";
+    svg += "<line x1='" + px(q2) + "' y1='" + (Y - 28) + "' x2='" + px(q2) + "' y2='" + (Y + 28) + "' stroke='var(--margin)' stroke-width='3'/>";
+    const AY = 115;
+    svg += "<line x1='" + L0 + "' y1='" + AY + "' x2='" + R0 + "' y2='" + AY + "' stroke='var(--ink)' stroke-width='1.5'/>";
+    for (let v = lo; v <= hi; v++) {
+      svg += "<line x1='" + px(v) + "' y1='" + (AY - (v % 2 ? 3 : 6)) + "' x2='" + px(v) + "' y2='" + (AY + (v % 2 ? 3 : 6)) + "' stroke='var(--ink)'/>";
+      if (v % 2 === 0) svg += "<text x='" + px(v) + "' y='" + (AY + 22) + "' text-anchor='middle'>" + v + "</text>";
+    }
+    vals.forEach((v, i) => {
+      const same = vals.slice(0, i).filter(x => x === v).length;
+      svg += "<circle cx='" + px(v) + "' cy='" + (AY - 12 - same * 9) + "' r='3.5' fill='var(--soft)'/>";
+    });
+    svg += "</svg>";
+    set("boxViz", svg);
+    const lf = q1 - 1.5 * iqr, uf = q3 + 1.5 * iqr, outs = vals.filter(v => v < lf || v > uf);
+    set("boxAlg", algHTML([
+      ["minimum", String(mn), "<b>Smallest value.</b> The left whisker ends here."],
+      ["Q1", String(q1), "<b>First quartile:</b> the median of the lower half (" + lower.join(", ") + ")."],
+      ["median", String(q2), "<b>The middle of all the data.</b> The red line inside the box."],
+      ["Q3", String(q3), "<b>Third quartile:</b> the median of the upper half (" + upper.join(", ") + ")."],
+      ["maximum", String(mx), "<b>Largest value.</b> The right whisker ends here."],
+      ["IQR", q3 + " − " + q1 + " = " + HOT(iqr), "<b>Interquartile range:</b> the width of the box. The middle half of the months fall in here."],
+      ["outlier fences", trim(lf, 1) + " and " + trim(uf, 1), "<b>Q1 − 1.5 × IQR and Q3 + 1.5 × IQR.</b> Anything outside these would be an outlier."]
+    ]));
+    set("boxAnswer", (outs.length ? "Outliers: <b>" + outs.join(", ") + "</b>." : "<b>No outliers:</b> every month falls between the fences.") +
+      " The dots under the plot are the " + n + " months, so you can see how the box splits them into quarters.");
+  }
+
+  function renderSciDiv(left, calLeft) {
+    if (left === 0 || calLeft === 0) { set("sdivAlg", ""); set("sdivAnswer", "No school time left to compare."); return; }
+    const a = left * HOURS_PER_DAY * 3600, b = calLeft * 86400;
+    const A = sciParts(a), B = sciParts(b);
+    const ac = Number(trim(A.c, 2)), bc = Number(trim(B.c, 2));
+    const qc = ac / bc, qe = A.e - B.e;
+    const Q = sciParts(qc * Math.pow(10, qe));
+    const rows = [
+      ["school seconds", SCI(ac, A.e, 2), "<b>From the scientific notation section:</b> " + left + " days × " + num(HOURS_PER_DAY * 3600) + " seconds."],
+      ["all seconds", SCI(bc, B.e, 2), "<b>Every second until the last day:</b> " + calLeft + " days × 86,400 seconds (24 × 60 × 60)."],
+      [FR(SCI(ac, A.e, 2), SCI(bc, B.e, 2)), FR(ac, bc) + " × 10<sup>" + A.e + " − " + B.e + "</sup>", "<b>Divide the numbers, subtract the exponents.</b>"],
+      ["", trim(qc, 3) + " × 10<sup>" + INT(qe) + "</sup>", "<b>Do the arithmetic.</b>", "≈"]
+    ];
+    if (qc < 1 || qc >= 10) rows.push(["", SCI(Q.c, Q.e, 2), "<b>Fix it</b> so exactly one nonzero digit is before the decimal point.", "≈"]);
+    rows.push(["", HOT(trim(a / b * 100, 1) + "%"), "<b>As a percent.</b>", "≈"]);
+    set("sdivAlg", algHTML(rows));
+    set("sdivAnswer", "Only about <b>" + trim(a / b * 100, 0) + "%</b> of all the time between now and the last day is spent in school. The rest is nights, weekends, and breaks.");
+  }
+
+  let lastExtras = "";
+  function renderExtras(done, left, calLeft, monLeft, t0) {
+    const sig = [done, left, calLeft, monLeft, key(t0)].join("|");
+    if (sig === lastExtras) return;
+    lastExtras = sig;
+    renderSimplest(done);
+    renderRatio(done, left);
+    renderPie(done);
+    renderLine(done, left);
+    renderRate(left, calLeft);
+    renderSci(left);
+    renderProb(left, monLeft);
+    renderDivisibility(left);
+    renderSqrt(left);
+    renderWeeks(left, calLeft);
+    renderMilestones(done);
+    renderChange(left, key(t0), t0);
+    renderNumberLine(t0);
+    renderStats(done);
+    renderDecimal(done);
+    renderSystem(done, left);
+    renderProp(done);
+    renderRect(done);
+    renderSector(done);
+    renderBox();
+    renderSciDiv(left, calLeft);
+  }
+
   let lastMathDone = -1;
 
   function render() {
@@ -408,7 +1211,7 @@
     const bar = document.getElementById("bar");
     bar.setAttribute("aria-valuenow", pct.toFixed(1));
     requestAnimationFrame(() => { document.getElementById("fill").style.width = pct + "%"; });
-    if (done !== lastMathDone) { renderMath(done); lastMathDone = done; }
+    if (done !== lastMathDone) { renderMath(done); renderProportion(done); lastMathDone = done; }
 
     // Tiles
     const tiles = document.getElementById("tiles");
@@ -460,6 +1263,7 @@
     const t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const calLeft = Math.max(0, Math.round((parse(LAST) - t0) / 86400000));
     document.getElementById("calLeft").textContent = calLeft;
+    renderExtras(done, left, calLeft, monLeft, t0);
   }
 
   // Hover / focus / tap tooltip
