@@ -296,19 +296,9 @@
     <div class="sheet"><div class="alg" id="ratioAlg"></div><p class="answer" id="ratioAnswer"></p></div>
   </section>
 
-  <section class="math" aria-labelledby="pieHead">
-    <h2 id="pieHead">The year as a circle graph</h2>
-    <div class="sheet"><div class="viz pie" id="pieViz"></div><div class="alg" id="pieAlg"></div><p class="answer" id="pieAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="lineHead">
     <h2 id="lineHead">Days left as a linear function</h2>
     <div class="sheet"><div class="viz graph" id="lineViz"></div><div class="alg" id="lineAlg"></div><p class="answer" id="lineAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="rateHead">
-    <h2 id="rateHead">Unit rate: calendar days per school day</h2>
-    <div class="sheet"><div class="alg" id="rateAlg"></div><p class="answer" id="rateAnswer"></p></div>
   </section>
 
   <section class="math" aria-labelledby="sciHead">
@@ -316,34 +306,14 @@
     <div class="sheet"><div class="alg" id="sciAlg"></div><p class="answer" id="sciAnswer"></p></div>
   </section>
 
-  <section class="math" aria-labelledby="probHead">
-    <h2 id="probHead">Probability of a Monday</h2>
-    <div class="sheet"><div class="alg" id="probAlg"></div><p class="answer" id="probAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="divHead">
     <h2 id="divHead">Divisibility rules for days left</h2>
     <div class="sheet"><div class="alg" id="divAlg"></div><p class="answer" id="divAnswer"></p></div>
   </section>
 
-  <section class="math" aria-labelledby="sqrtHead">
-    <h2 id="sqrtHead">Estimating the square root of days left</h2>
-    <div class="sheet"><div class="alg" id="sqrtAlg"></div><p class="answer" id="sqrtAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="weeksHead">
-    <h2 id="weeksHead">School weeks left, with remainders</h2>
-    <div class="sheet"><div class="alg" id="weeksAlg"></div><p class="answer" id="weeksAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="mileHead">
     <h2 id="mileHead">Percent of a number: milestones ahead</h2>
     <div class="sheet"><div class="alg stack" id="mileAlg"></div><p class="answer" id="mileAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="chgHead">
-    <h2 id="chgHead">Percent change over the last 30 days</h2>
-    <div class="sheet"><div class="alg stack" id="chgAlg"></div><p class="answer" id="chgAnswer"></p></div>
   </section>
 
   <section class="math" aria-labelledby="nlHead">
@@ -361,34 +331,14 @@
     <div class="sheet"><div class="alg" id="decAlg"></div><p class="answer" id="decAnswer"></p></div>
   </section>
 
-  <section class="math" aria-labelledby="sysHead">
-    <h2 id="sysHead">A system of equations for today</h2>
-    <div class="sheet"><div class="alg" id="sysAlg"></div><p class="answer" id="sysAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="prop2Head">
     <h2 id="prop2Head">A proportional relationship: hours in school</h2>
     <div class="sheet"><div class="viz graph" id="prop2Viz"></div><div class="alg" id="prop2Alg"></div><p class="answer" id="prop2Answer"></p></div>
   </section>
 
-  <section class="math" aria-labelledby="rectHead">
-    <h2 id="rectHead">Rectangles with an area of 180</h2>
-    <div class="sheet"><div class="viz rect" id="rectViz"></div><div class="alg stack" id="rectAlg"></div><p class="answer" id="rectAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="sectHead">
-    <h2 id="sectHead">Area and arc length of the circle graph slice</h2>
-    <div class="sheet"><div class="alg stack" id="sectAlg"></div><p class="answer" id="sectAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="boxHead">
     <h2 id="boxHead">Box plot of school days per month</h2>
     <div class="sheet"><div class="viz wide" id="boxViz"></div><div class="alg stack" id="boxAlg"></div><p class="answer" id="boxAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="sdivHead">
-    <h2 id="sdivHead">Dividing in scientific notation</h2>
-    <div class="sheet"><div class="alg stack" id="sdivAlg"></div><p class="answer" id="sdivAnswer"></p></div>
   </section>
 
   <footer>
@@ -657,35 +607,6 @@
       : "For every 1 day left, there are " + (done % left ? "about " : "") + "<b>" + trim(done / left, 1) + "</b> days done. More than halfway!");
   }
 
-  function renderPie(done) {
-    const deg = done / TOTAL * 360;
-    const cx = 110, cy = 110, r = 95, a = deg * Math.PI / 180;
-    let slice = "";
-    if (done === TOTAL) slice = "<circle cx='" + cx + "' cy='" + cy + "' r='" + r + "' fill='var(--ink)'/>";
-    else if (done > 0) {
-      const x = cx + r * Math.sin(a), y = cy - r * Math.cos(a);
-      slice = "<path d='M" + cx + " " + cy + " L" + cx + " " + (cy - r) + " A" + r + " " + r + " 0 " + (deg > 180 ? 1 : 0) +
-        " 1 " + x.toFixed(2) + " " + y.toFixed(2) + " Z' fill='var(--ink)'/>";
-    }
-    // small red arc showing the angle
-    let arc = "";
-    if (done > 0 && done < TOTAL) {
-      const ar = 30, ax = cx + ar * Math.sin(a), ay = cy - ar * Math.cos(a);
-      arc = "<path d='M" + cx + " " + (cy - ar) + " A" + ar + " " + ar + " 0 " + (deg > 180 ? 1 : 0) + " 1 " + ax.toFixed(2) + " " + ay.toFixed(2) +
-        "' fill='none' stroke='var(--pencil)' stroke-width='5'/>";
-    }
-    set("pieViz",
-      "<svg viewBox='0 0 220 220' role='img' aria-label='Circle graph: " + done + " of " + TOTAL + " school days done, a " + trim(deg, 1) + " degree slice'>" +
-      "<circle cx='" + cx + "' cy='" + cy + "' r='" + r + "' fill='var(--tile-empty)'/>" + slice + arc +
-      "<circle cx='" + cx + "' cy='" + cy + "' r='" + r + "' fill='none' stroke='var(--ink)' stroke-width='3'/></svg>");
-    set("pieAlg", algHTML([
-      [FR(done, TOTAL) + " × 360°", XV, "<b>A full circle is 360°.</b> The slice is the same fraction of the circle as the fraction of the year that's done."],
-      [FR(360, TOTAL), "2", "<b>Shortcut.</b> 360 ÷ " + TOTAL + " = 2, so every school day adds 2° to the slice."],
-      [XV, done + " × 2 = " + HOT(done * 2 + "°"), "<b>Double the days done.</b>"]
-    ]));
-    set("pieAnswer", "The dark slice is <b>" + done * 2 + "°</b>" + (done > 0 && done < TOTAL ? " (the yellow arc marks the angle)" : "") + ". The light part is " + (360 - done * 2) + "°, which is 2 × " + (TOTAL - done) + " days left.");
-  }
-
   function renderLine(done, left) {
     const W = 400, H = 320, L0 = 52, R0 = 386, T0 = 16, B0 = 270;
     const px = x => L0 + x * (R0 - L0) / TOTAL, py = y => B0 - y * (B0 - T0) / TOTAL;
@@ -720,22 +641,6 @@
     set("lineAnswer", "Today is the point <b>(" + done + ", " + left + ")</b> on the line. Tomorrow's point will be one step down and to the right.");
   }
 
-  function renderRate(left, calLeft) {
-    if (left === 0) {
-      set("rateAlg", "");
-      set("rateAnswer", "No school days left, so there's no rate to find. See you in August!");
-      return;
-    }
-    const rate = calLeft / left, back = left / calLeft;
-    set("rateAlg", algHTML([
-      [FR(calLeft, left), XV, "<b>Set up the rate.</b> " + calLeft + " calendar days until the last day, over " + left + " school days left."],
-      [XV, HOT(trim(rate, 2)), "<b>Divide " + calLeft + " ÷ " + left + " to get a unit rate:</b> calendar days for each 1 school day.", Number(trim(rate, 2)) === rate ? "=" : "≈"],
-      [FR(left, calLeft), trim(back, 2) + " ≈ " + Math.round(back * 100) + "%", "<b>Flip it.</b> School days per calendar day, as a decimal and a percent.", Number(trim(back, 2)) === back ? "=" : "≈"]
-    ]));
-    set("rateAnswer", "Each school day left comes with about <b>" + trim(rate, 2) + "</b> calendar days, because weekends and breaks are mixed in. Only about <b>" +
-      Math.round(back * 100) + "%</b> of the days until the last day are school days.");
-  }
-
   function renderSci(left) {
     const hours = left * HOURS_PER_DAY, secs = hours * 3600;
     if (secs === 0) {
@@ -750,27 +655,6 @@
       [num(secs), HOT(trim(coef, 4)) + " × 10<sup>" + exp + "</sup>", "<b>Scientific notation.</b> Move the decimal point " + exp + " places left so one digit is in front, and multiply by 10<sup>" + exp + "</sup>."]
     ]));
     set("sciAnswer", "About <b>" + trim(coef, 1) + " × 10<sup>" + exp + "</sup></b> seconds of school left. Every day that ends takes away " + num(HOURS_PER_DAY * 3600) + " seconds.");
-  }
-
-  function renderProb(left, monLeft) {
-    if (left === 0) {
-      set("probAlg", "");
-      set("probAnswer", "No school days left to pick from.");
-      return;
-    }
-    const g = gcd(monLeft, left) || 1, p = monLeft / left;
-    const rows = [
-      ["P(Monday)", FR(monLeft, left), "<b>Favorable over total.</b> Mondays left out of all school days left."]
-    ];
-    if (g > 1) rows.push(["", FR(monLeft / g, left / g), "<b>Simplify</b> by dividing both by " + g + "."]);
-    const pExact = Number(trim(p, 3)) === p;
-    rows.push(["", trim(p, 3) + (pExact ? " = " : " ≈ ") + HOT(trim(p * 100, 1) + "%"), "<b>Decimal and percent.</b> Divide, then multiply by 100.", pExact ? "=" : "≈"]);
-    rows.push(["full weeks", FR(1, 5) + " = 20%", "<b>Compare.</b> If every week had 5 school days, 1 of every 5 would be a Monday."]);
-    set("probAlg", algHTML(rows));
-    set("probAnswer", monLeft === 0
-      ? "No school Mondays are left, so the probability is <b>0</b>."
-      : "If you pick one remaining school day at random, the chance it's a Monday is " + (pExact ? "" : "about ") + "<b>" + trim(p * 100, 1) + "%</b>. " +
-        (p < 0.2 ? "That's less than 20% because Monday holidays like MLK Day and Presidents' Day take some away." : "That's at or above 20% for these remaining weeks."));
   }
 
 
@@ -808,40 +692,6 @@
       (count === 2 ? " is <b>prime</b>." : " is <b>composite</b>."));
   }
 
-  function renderSqrt(n) {
-    if (n === 0) { set("sqrtAlg", ""); set("sqrtAnswer", "√0 = 0. No days left!"); return; }
-    const r = Math.floor(Math.sqrt(n)), lo = r * r, hi = (r + 1) * (r + 1);
-    if (lo === n) {
-      set("sqrtAlg", algHTML([[r + "<sup>2</sup>", String(n), "<b>" + n + " is a perfect square.</b>"], ["√" + n, HOT(r), "<b>So the square root is a whole number.</b>"]]));
-      set("sqrtAnswer", "Today's number is a <b>perfect square</b>: " + r + " × " + r + " = " + n + ".");
-      return;
-    }
-    const est = r + (n - lo) / (hi - lo), real = Math.sqrt(n);
-    set("sqrtAlg", algHTML([
-      [r + "<sup>2</sup>", String(lo), "<b>The perfect square just below " + n + ".</b>"],
-      [(r + 1) + "<sup>2</sup>", String(hi), "<b>The perfect square just above " + n + ".</b>"],
-      [String(r), "√" + n + " &lt; " + (r + 1), "<b>So √" + n + " is between " + r + " and " + (r + 1) + ".</b> " + n + " isn't a perfect square, so its root is irrational.", "&lt;"],
-      ["√" + n, r + " + " + FR(n - lo, hi - lo) + " ≈ " + trim(est, 2), "<b>Estimate.</b> " + n + " is " + (n - lo) + " of the " + (hi - lo) + " steps from " + lo + " to " + hi + ".", "≈"],
-      ["√" + n, HOT(trim(real, 2)), "<b>Check with a calculator.</b> " + trim(real, 2) + " × " + trim(real, 2) + " ≈ " + trim(Number(real.toFixed(2)) ** 2, 2) + ".", "≈"]
-    ]));
-    set("sqrtAnswer", "√" + n + " is closer to <b>" + (n - lo < hi - n ? r : r + 1) + "</b>, because " + n + " is " +
-      (n - lo) + " away from " + lo + " and " + (hi - n) + " away from " + hi + ".");
-  }
-
-  function renderWeeks(left, calLeft) {
-    if (left === 0) { set("weeksAlg", ""); set("weeksAnswer", "Zero weeks left. Summer's here!"); return; }
-    const q = Math.floor(left / 5), r = left % 5;
-    const rows = [
-      [left + " ÷ 5", q + (r ? " R " + r : ""), "<b>Divide by 5,</b> since a full school week has 5 days."],
-      [FR(left, 5), r ? q + " " + FR(r, 5) : String(q), r ? "<b>As a mixed number,</b> the remainder goes over the divisor." : "<b>No remainder,</b> so it's a whole number of weeks."],
-    ];
-    if (r) rows.push([FR(left, 5), trim(left / 5, 1), "<b>As a decimal.</b>"]);
-    if (calLeft > 0) rows.push([calLeft + " ÷ 7", trim(calLeft / 7, 1), "<b>Calendar weeks</b> until the last day, for comparison.", "≈"]);
-    set("weeksAlg", algHTML(rows));
-    set("weeksAnswer", "That's <b>" + q + " full school week" + (q === 1 ? "" : "s") + (r ? " and " + r + " day" + (r === 1 ? "" : "s") : "") + "</b>" +
-      (calLeft > 0 ? ", spread across about " + Math.ceil(calLeft / 7) + " calendar weeks. The extra weeks are holidays and breaks." : "."));
-  }
-
   function renderMilestones(done) {
     const rows = [25, 50, 75, 90].map(p => {
       const d = p * TOTAL / 100, date = fmt(parse(days[d - 1]));
@@ -858,26 +708,6 @@
     set("mileAnswer", done === TOTAL ? "Every milestone is done. That's the whole year!" : done >= fs
       ? "You're in the final stretch: fewer than 30 days left."
       : "The final stretch starts once day <b>" + fs + "</b> (" + fmt(parse(days[fs - 1])) + ") is done.");
-  }
-
-  function renderChange(left, todayKey, t0) {
-    const agoKey = addDays(key(t0), -30);
-    const leftAgo = TOTAL - days.filter(k => k <= agoKey).length;
-    const change = left - leftAgo;
-    if (change === 0 || leftAgo === 0) {
-      set("chgAlg", algHTML([["days left 30 days ago", String(leftAgo), "On " + fmt(parse(agoKey)) + "."], ["days left now", String(left), ""]]));
-      set("chgAnswer", "No change over the last 30 days, so the percent change is <b>0%</b>.");
-      return;
-    }
-    const pct = change / leftAgo * 100;
-    set("chgAlg", algHTML([
-      ["old", String(leftAgo), "<b>Days left 30 days ago</b> (after " + fmt(parse(agoKey)) + ")."],
-      ["new", String(left), "<b>Days left now.</b>"],
-      ["change", left + " − " + leftAgo + " = " + INT(change), "<b>New minus old.</b> Negative means it went down."],
-      ["% change", FR(INT(change), leftAgo) + " × 100", "<b>Divide the change by the original amount,</b> then multiply by 100."],
-      ["", HOT(INT(Number(pct.toFixed(1))) + "%"), "<b>Rounded to one decimal place.</b>", "≈"]
-    ]));
-    set("chgAnswer", (left === 0 ? "Days left <b>decreased by 100%</b>. They're all gone!" : "Days left <b>decreased by about " + trim(-pct, 1) + "%</b> in the last 30 days. The percent change tends to grow each month because the original amount keeps shrinking."));
   }
 
   function renderNumberLine(t0) {
@@ -1007,19 +837,6 @@
       : "The denominator's only prime factors are 2 and 5, so the decimal <b>terminates</b>.");
   }
 
-  function renderSystem(done, left) {
-    const D = done - left;
-    set("sysAlg", algHTML([
-      [XV + " + y", String(TOTAL), "<b>Equation 1.</b> Days done (x) plus days left (y) is the whole year."],
-      [XV + " − y", INT(D), "<b>Equation 2.</b> Today, days done minus days left is " + INT(D) + (D < 0 ? " (negative because more days are left than done)." : ".")],
-      ["2" + XV, TOTAL + " + " + PINT(D) + " = " + (TOTAL + D), "<b>Add the equations.</b> The +y and −y cancel out. That's elimination."],
-      [XV, FR(TOTAL + D, 2) + " = " + HOT(done), "<b>Divide both sides by 2.</b>"],
-      ["y", TOTAL + " − " + done + " = " + HOT(left), "<b>Substitute</b> x = " + done + " back into Equation 1."]
-    ]));
-    set("sysAnswer", "The solution is <b>(" + done + ", " + left + ")</b>: " + done + (done === 1 ? " day" : " days") + " done and " + left + (left === 1 ? " day" : " days") + " left. Check it: " +
-      done + " + " + left + " = " + TOTAL + " and " + done + " − " + left + " = " + INT(D) + ". Both equations are true.");
-  }
-
   function renderProp(done) {
     const k = HOURS_PER_DAY, maxX = TOTAL, maxY = TOTAL * k;
     const W = 400, H = 300, L0 = 56, R0 = 386, T0 = 16, B0 = 252;
@@ -1051,48 +868,6 @@
     );
     set("prop2Alg", algHTML(rows));
     set("prop2Answer", "At about " + k + " hours a day, you've spent about <b>" + num(done * k) + " hours</b> in school this year.");
-  }
-
-  function renderRect(done) {
-    const pairs = [];
-    for (let a = 1; a * a <= TOTAL; a++) if (TOTAL % a === 0) pairs.push([a, TOTAL / a]);
-    const [h, w] = pairs[pairs.length - 1]; // the most square one (12 × 15)
-    const cell = 20, ox = 26, oy = 24;
-    let svg = "<svg viewBox='0 0 " + (ox + w * cell + 40) + " " + (oy + h * cell + 8) + "' role='img' aria-label='" + h + " by " + w + " rectangle of " + TOTAL + " tiles, " + done + " filled in'>";
-    for (let i = 0; i < TOTAL; i++) {
-      const r = Math.floor(i / w), c = i % w;
-      svg += "<rect x='" + (ox + c * cell + 1) + "' y='" + (oy + r * cell + 1) + "' width='" + (cell - 2) + "' height='" + (cell - 2) + "' rx='3' fill='" + (i < done ? "var(--ink)" : "var(--tile-empty)") + "'/>";
-    }
-    svg += "<rect x='" + ox + "' y='" + oy + "' width='" + w * cell + "' height='" + h * cell + "' fill='none' stroke='var(--ink)' stroke-width='2'/>";
-    svg += "<line x1='" + ox + "' y1='" + oy + "' x2='" + (ox + w * cell) + "' y2='" + (oy + h * cell) + "' stroke='var(--margin)' stroke-width='2.5' stroke-dasharray='6 4'/>";
-    svg += "<text class='lab' x='" + (ox + w * cell / 2) + "' y='" + (oy - 8) + "' text-anchor='middle'>" + w + "</text>";
-    svg += "<text class='lab' x='" + (ox - 8) + "' y='" + (oy + h * cell / 2 + 4) + "' text-anchor='end'>" + h + "</text></svg>";
-    set("rectViz", svg);
-    const diag2 = h * h + w * w, fullRows = Math.floor(done / w), extra = done % w;
-    set("rectAlg", algHTML([
-      ["A", h + " × " + w + " = " + TOTAL, "<b>Area (A):</b> one square tile per school day. " + h + " × " + w + " is the most square way to arrange " + TOTAL + " tiles."],
-      ["P", "2(" + h + " + " + w + ") = " + 2 * (h + w), "<b>Perimeter (P) of the " + h + " × " + w + " rectangle.</b> Add the length and width, then double it. This is the smallest perimeter any " + TOTAL + "-tile rectangle can have."],
-      ["P", "2(1 + " + TOTAL + ") = " + 2 * (1 + TOTAL), "<b>Perimeter of a 1 × " + TOTAL + " rectangle.</b> Same area, but a much bigger perimeter when the rectangle is long and skinny."],
-      ["d", "√(" + h + "<sup>2</sup> + " + w + "<sup>2</sup>)", "<b>Diagonal (d), with the Pythagorean theorem.</b> The dashed diagonal is the hypotenuse of a right triangle."],
-      ["", "√" + diag2 + " ≈ " + HOT(trim(Math.sqrt(diag2), 1)), "<b>" + h * h + " + " + w * w + " = " + diag2 + ",</b> then take the square root.", "≈"],
-      ["done", done ? fullRows + " × " + w + (extra ? " + " + extra : "") + " = " + done : "0",
-        "<b>Filled area.</b> " + fullRows + " full row" + (fullRows === 1 ? "" : "s") + " of " + w + (extra ? " plus " + extra + " more tile" + (extra === 1 ? "" : "s") : "") + "."]
-    ]));
-    set("rectAnswer", "Every rectangle with an area of " + TOTAL + ": " +
-      pairs.map(([a, b]) => a + " × " + b + " (P = " + 2 * (a + b) + ")").join(", ") + ". Same area, very different perimeters.");
-  }
-
-  function renderSector(done) {
-    const r = 10, PI = 3.14, frac = done / TOTAL, deg = done * 2;
-    const area = PI * r * r, circ = 2 * PI * r;
-    set("sectAlg", algHTML([
-      ["area of circle", "3.14 × 10<sup>2</sup> = " + trim(area, 2) + " cm<sup>2</sup>", "<b>A = πr<sup>2</sup>,</b> if the circle graph had a 10 cm radius (π ≈ 3.14)."],
-      ["slice area", FR(deg, 360) + " × " + trim(area, 2) + " ≈ " + HOT(trim(area * frac, 1) + " cm<sup>2</sup>"), "<b>The slice gets the same fraction of the area</b> as its angle is of 360°."],
-      ["circumference", "2 × 3.14 × 10 = " + trim(circ, 1) + " cm", "<b>C = 2πr.</b>"],
-      ["arc length", FR(deg, 360) + " × " + trim(circ, 1) + " ≈ " + HOT(trim(circ * frac, 1) + " cm"), "<b>The curved edge of the slice</b> is the same fraction of the circumference."]
-    ]));
-    set("sectAnswer", "The done slice covers about <b>" + trim(area * frac, 1) + " cm<sup>2</sup></b>, and its curved edge is about <b>" +
-      trim(circ * frac, 1) + " cm</b> long.");
   }
 
   function renderBox() {
@@ -1135,25 +910,6 @@
       " The dots under the plot are the " + n + " months, so you can see how the box splits them into quarters.");
   }
 
-  function renderSciDiv(left, calLeft) {
-    if (left === 0 || calLeft === 0) { set("sdivAlg", ""); set("sdivAnswer", "No school time left to compare."); return; }
-    const a = left * HOURS_PER_DAY * 3600, b = calLeft * 86400;
-    const A = sciParts(a), B = sciParts(b);
-    const ac = Number(trim(A.c, 2)), bc = Number(trim(B.c, 2));
-    const qc = ac / bc, qe = A.e - B.e;
-    const Q = sciParts(qc * Math.pow(10, qe));
-    const rows = [
-      ["school seconds", SCI(ac, A.e, 2), "<b>From the scientific notation section:</b> " + left + " days × " + num(HOURS_PER_DAY * 3600) + " seconds."],
-      ["all seconds", SCI(bc, B.e, 2), "<b>Every second until the last day:</b> " + calLeft + " days × 86,400 seconds (24 × 60 × 60)."],
-      [FR(SCI(ac, A.e, 2), SCI(bc, B.e, 2)), FR(ac, bc) + " × 10<sup>" + A.e + " − " + B.e + "</sup>", "<b>Divide the numbers, subtract the exponents.</b>"],
-      ["", trim(qc, 3) + " × 10<sup>" + INT(qe) + "</sup>", "<b>Do the arithmetic.</b>", "≈"]
-    ];
-    if (qc < 1 || qc >= 10) rows.push(["", SCI(Q.c, Q.e, 2), "<b>Fix it</b> so exactly one nonzero digit is before the decimal point.", "≈"]);
-    rows.push(["", HOT(trim(a / b * 100, 1) + "%"), "<b>As a percent.</b>", "≈"]);
-    set("sdivAlg", algHTML(rows));
-    set("sdivAnswer", "Only about <b>" + trim(a / b * 100, 0) + "%</b> of all the time between now and the last day is spent in school. The rest is nights, weekends, and breaks.");
-  }
-
   let lastExtras = "";
   function renderExtras(done, left, calLeft, monLeft, t0) {
     const sig = [done, left, calLeft, monLeft, key(t0)].join("|");
@@ -1161,25 +917,15 @@
     lastExtras = sig;
     renderSimplest(done);
     renderRatio(done, left);
-    renderPie(done);
     renderLine(done, left);
-    renderRate(left, calLeft);
     renderSci(left);
-    renderProb(left, monLeft);
     renderDivisibility(left);
-    renderSqrt(left);
-    renderWeeks(left, calLeft);
     renderMilestones(done);
-    renderChange(left, key(t0), t0);
     renderNumberLine(t0);
     renderStats(done);
     renderDecimal(done);
-    renderSystem(done, left);
     renderProp(done);
-    renderRect(done);
-    renderSector(done);
     renderBox();
-    renderSciDiv(left, calLeft);
   }
 
   let lastMathDone = -1;
