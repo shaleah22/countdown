@@ -212,7 +212,6 @@
   .alg.stack { grid-template-columns: max-content max-content max-content; row-gap: 4px; }
   .alg.stack .note { grid-column: 1 / -1; padding: 0 0 16px; width: 0; min-width: 100%; }
   .alg .yes { color: #2E9E62; font-weight: 800; }
-  .alg .rep { text-decoration: overline; text-decoration-thickness: 2px; }
   .viz.rect svg { max-width: 360px; }
   .alg .no { color: var(--soft); }
   .viz text { font-family: "Atkinson Hyperlegible", system-ui, sans-serif; fill: var(--soft); font-size: 12px; }
@@ -278,24 +277,6 @@
     </div>
   </section>
 
-  <section class="math" aria-labelledby="propHead">
-    <h2 id="propHead">Same answer, as a percent proportion</h2>
-    <div class="sheet">
-      <div class="alg" id="alg"></div>
-      <p class="answer" id="propAnswer"></p>
-    </div>
-  </section>
-
-  <section class="math" aria-labelledby="simpHead">
-    <h2 id="simpHead">Simplest form of the fraction</h2>
-    <div class="sheet"><div class="alg" id="simpAlg"></div><p class="answer" id="simpAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="ratioHead">
-    <h2 id="ratioHead">Ratio of days done to days left</h2>
-    <div class="sheet"><div class="alg" id="ratioAlg"></div><p class="answer" id="ratioAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="lineHead">
     <h2 id="lineHead">Days left as a linear function</h2>
     <div class="sheet"><div class="viz graph" id="lineViz"></div><div class="alg" id="lineAlg"></div><p class="answer" id="lineAnswer"></p></div>
@@ -304,16 +285,6 @@
   <section class="math" aria-labelledby="sciHead">
     <h2 id="sciHead">Seconds of school left, in scientific notation</h2>
     <div class="sheet"><div class="alg" id="sciAlg"></div><p class="answer" id="sciAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="divHead">
-    <h2 id="divHead">Divisibility rules for days left</h2>
-    <div class="sheet"><div class="alg" id="divAlg"></div><p class="answer" id="divAnswer"></p></div>
-  </section>
-
-  <section class="math" aria-labelledby="mileHead">
-    <h2 id="mileHead">Percent of a number: milestones ahead</h2>
-    <div class="sheet"><div class="alg stack" id="mileAlg"></div><p class="answer" id="mileAnswer"></p></div>
   </section>
 
   <section class="math" aria-labelledby="nlHead">
@@ -326,14 +297,32 @@
     <div class="sheet"><div class="viz wide" id="statViz"></div><div class="alg stack" id="statAlg"></div><p class="answer" id="statAnswer"></p></div>
   </section>
 
-  <section class="math" aria-labelledby="decHead">
-    <h2 id="decHead">Repeating or terminating decimal?</h2>
-    <div class="sheet"><div class="alg" id="decAlg"></div><p class="answer" id="decAnswer"></p></div>
-  </section>
-
   <section class="math" aria-labelledby="prop2Head">
     <h2 id="prop2Head">A proportional relationship: hours in school</h2>
     <div class="sheet"><div class="viz graph" id="prop2Viz"></div><div class="alg" id="prop2Alg"></div><p class="answer" id="prop2Answer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="propHead">
+    <h2 id="propHead">Same answer, as a percent proportion</h2>
+    <div class="sheet">
+      <div class="alg" id="alg"></div>
+      <p class="answer" id="propAnswer"></p>
+    </div>
+  </section>
+
+  <section class="math" aria-labelledby="ratioHead">
+    <h2 id="ratioHead">Ratio of days done to days left</h2>
+    <div class="sheet"><div class="alg" id="ratioAlg"></div><p class="answer" id="ratioAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="mileHead">
+    <h2 id="mileHead">Percent of a number: milestones ahead</h2>
+    <div class="sheet"><div class="alg stack" id="mileAlg"></div><p class="answer" id="mileAnswer"></p></div>
+  </section>
+
+  <section class="math" aria-labelledby="divHead">
+    <h2 id="divHead">Divisibility rules for days left</h2>
+    <div class="sheet"><div class="alg" id="divAlg"></div><p class="answer" id="divAnswer"></p></div>
   </section>
 
   <section class="math" aria-labelledby="boxHead">
@@ -550,42 +539,6 @@
     return f;
   }
 
-  function renderSimplest(done) {
-    if (done === 0) {
-      set("simpAlg", algHTML([[FR(0, TOTAL), "0", "<b>Zero out of anything is zero.</b>"]]));
-      set("simpAnswer", "Check back after the first day of school.");
-      return;
-    }
-    const fT = primeFactors(TOTAL), fD = primeFactors(done);
-    // mark the factors the two numbers share
-    const pool = fT.slice(), shared = [];
-    fD.forEach(p => { const i = pool.indexOf(p); if (i >= 0) { shared.push(p); pool.splice(i, 1); } });
-    const mark = (list) => { const s = shared.slice(); return list.map(p => { const i = s.indexOf(p); if (i >= 0) { s.splice(i, 1); return HOT(p); } return p; }).join(" · "); };
-    const g = gcd(done, TOTAL);
-    const rows = [
-      [TOTAL, mark(fT), "<b>Prime factorization of " + TOTAL + ".</b> Break it into primes with a factor tree."],
-      [done, fD.length === 1 && done > 1 ? done : (done === 1 ? "1" : mark(fD)),
-        fD.length === 1 && done > 1 ? "<b>" + done + " is prime,</b> so it can't be broken down." : "<b>Prime factorization of " + done + ".</b>"],
-      ["GCF", shared.length ? shared.map(HOT).join(" · ") + (shared.length > 1 ? " = " + g : "") : "1",
-        shared.length ? "<b>Multiply the shared factors</b> (in red) to get the greatest common factor." : "<b>No shared factors,</b> so the GCF is 1."]
-    ];
-    if (g > 1) rows.push([FR(done + " ÷ " + g, TOTAL + " ÷ " + g), FR(done / g, TOTAL / g), "<b>Divide the top and bottom by the GCF.</b>"]);
-    else rows.push([FR(done, TOTAL), FR(done, TOTAL), "<b>Already in simplest form,</b> because the GCF is 1."]);
-    set("simpAlg", algHTML(rows));
-    // next day that simplifies to a fraction with a small denominator
-    let milestone = "";
-    for (let d = done + 1; d <= TOTAL; d++) {
-      const gg = gcd(d, TOTAL), den = TOTAL / gg;
-      if (den <= 12) {
-        milestone = " Next nice milestone: day " + d + " (" + fmt(parse(days[d - 1])) + "), when the year is <b>" +
-          (den === 1 ? "all done" : (d / gg) + "/" + den + "</b> done") + (den === 1 ? "</b>." : ".");
-        break;
-      }
-    }
-    set("simpAnswer", (done === TOTAL ? "So " + done + "/" + TOTAL + " = <b>1</b>. The whole year is done."
-      : g === 1 ? "So <b>" + done + "/" + TOTAL + "</b> is already as simple as it gets." : "So " + done + "/" + TOTAL + " = <b>" + (done / g) + "/" + (TOTAL / g) + "</b> of the year is done.") + milestone);
-  }
-
   function renderRatio(done, left) {
     if (done === 0 || left === 0) {
       set("ratioAlg", algHTML([[done + " : " + left, done + " : " + left, "<b>Days done to days left.</b>"]]));
@@ -698,16 +651,11 @@
       const status = done >= d ? "<b>Done</b> on " + date + "." : "<b>Day " + d + ", " + date + ".</b> " + (d - done) + " school day" + (d - done === 1 ? "" : "s") + " away.";
       return [p + "% of " + TOTAL, trim(p / 100, 2) + " × " + TOTAL + " = " + (done >= d ? d : HOT(d)), status];
     });
-    rows.push(
-      [TOTAL + " − " + XV, "30", "<b>Inequality:</b> when will fewer than 30 days be left?", "&lt;"],
-      ["−" + XV, "−" + (TOTAL - 30), "<b>Subtract " + TOTAL + " from both sides.</b>", "&lt;"],
-      [XV, HOT(TOTAL - 30), "<b>Divide both sides by −1,</b> and flip the inequality sign.", "&gt;"]
-    );
     set("mileAlg", algHTML(rows));
-    const fs = TOTAL - 29; // first whole number greater than 150
-    set("mileAnswer", done === TOTAL ? "Every milestone is done. That's the whole year!" : done >= fs
-      ? "You're in the final stretch: fewer than 30 days left."
-      : "The final stretch starts once day <b>" + fs + "</b> (" + fmt(parse(days[fs - 1])) + ") is done.");
+    const next = [25, 50, 75, 90].find(p => done < p * TOTAL / 100);
+    set("mileAnswer", next === undefined
+      ? (done === TOTAL ? "Every milestone is done. That's the whole year!" : "Every milestone is done. Almost there!")
+      : "Next milestone: <b>" + next + "%</b> of the year, on day " + (next * TOTAL / 100) + ".");
   }
 
   function renderNumberLine(t0) {
@@ -815,28 +763,6 @@
   const sciParts = n => { const e = Math.floor(Math.log10(n)); return { c: n / Math.pow(10, e), e }; };
   const SCI = (c, e, places) => trim(c, places) + " × 10<sup>" + INT(e) + "</sup>";
 
-  function renderDecimal(done) {
-    const g = gcd(done, TOTAL) || TOTAL, a = done / g, b = TOTAL / g;
-    // long division, watching for a remainder we've seen before
-    let rem = a % b; const whole = Math.floor(a / b), digs = [], seen = {};
-    while (rem !== 0 && !(rem in seen)) { seen[rem] = digs.length; rem *= 10; digs.push(Math.floor(rem / b)); rem %= b; }
-    const repeats = rem !== 0;
-    const start = repeats ? seen[rem] : digs.length;
-    const shown = whole + (digs.length ? "." + digs.slice(0, start).join("") + (repeats ? "<span class='rep'>" + digs.slice(start).join("") + "</span>" : "") : "");
-    const bf = primeFactors(b);
-    const others = bf.filter(f => f !== 2 && f !== 5);
-    const rows = [
-      [FR(done, TOTAL), b === 1 ? String(a) : FR(a, b), g > 1 ? "<b>Simplify first</b> (divide by the GCF, " + g + ")." : "<b>Already in simplest form.</b>"]
-    ];
-    if (b > 1) rows.push(["denominator " + b, bf.map(f => f === 2 || f === 5 ? f : HOT(f)).join(" · "),
-      others.length ? "<b>Factor the denominator.</b> The red factors aren't 2 or 5." : "<b>Factor the denominator.</b> Only 2s and 5s."]);
-    rows.push([FR(a, b), HOT(shown), repeats ? "<b>Divide.</b> The bar shows the digits that repeat forever." : "<b>Divide.</b> The division ends with no remainder."]);
-    set("decAlg", algHTML(rows));
-    set("decAnswer", b === 1 ? "A whole number, so there's no decimal part at all."
-      : others.length ? "The denominator has a factor of " + [...new Set(others)].join(" and ") + ", so the decimal is <b>repeating</b>. A simplified fraction only terminates when its denominator's only prime factors are 2 and 5."
-      : "The denominator's only prime factors are 2 and 5, so the decimal <b>terminates</b>.");
-  }
-
   function renderProp(done) {
     const k = HOURS_PER_DAY, maxX = TOTAL, maxY = TOTAL * k;
     const W = 400, H = 300, L0 = 56, R0 = 386, T0 = 16, B0 = 252;
@@ -915,7 +841,6 @@
     const sig = [done, left, calLeft, monLeft, key(t0)].join("|");
     if (sig === lastExtras) return;
     lastExtras = sig;
-    renderSimplest(done);
     renderRatio(done, left);
     renderLine(done, left);
     renderSci(left);
@@ -923,7 +848,6 @@
     renderMilestones(done);
     renderNumberLine(t0);
     renderStats(done);
-    renderDecimal(done);
     renderProp(done);
     renderBox();
   }
